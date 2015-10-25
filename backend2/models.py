@@ -23,3 +23,19 @@ class Post(db.Model):
     #def __str__(self):
     #    d = self.dateAdd
     #    return '<dateAdd: %s>' % (d.strftime("%d.%m.%y %H:%M"))
+
+
+class Comments(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id_whoAdd = db.Column(db.Integer, index=True, nullable=False)
+    post_id = db.Column(db.Integer, index=True, nullable=False)
+    text = db.Column(db.String(140), index=True, nullable=False)
+    dateAdd = db.Column(db.DateTime, index=True, nullable=False)
+    dateDelete = db.Column(db.DateTime, index=True, nullable=True)
+
+    def __init__(self, userid, postid, usertext):
+        self.user_id_whoAdd = userid
+        self.post_id = postid
+        self.text = usertext
+        self.dateAdd = datetime.utcnow()
+        self.dateDelete = None

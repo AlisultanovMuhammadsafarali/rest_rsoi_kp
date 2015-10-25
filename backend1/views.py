@@ -40,7 +40,7 @@ def me(userid=None):
         if me is not None:
             u = []
             for user in me:
-                u.append({'userid': user.user_fk, 'username': user.name})
+                u.append({'userid': user.user_fk, 'avatarid': user.avatar_id, 'username': user.name, 'email': user.email, 'phone': user.phone})
             code = 200
             data = u
         else:
