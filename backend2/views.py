@@ -20,7 +20,7 @@ def entries(userid=None):
     if entry is not None:
         u = []
         for e in entry:
-            print str(e.user_fk)+", "+e.title+", "+e.text+", "+str(e.dateAdd)+", "+str(e.dateDelete)
+            #print str(e.user_fk)+", "+e.title+", "+e.text+", "+str(e.dateAdd)+", "+str(e.dateDelete)
             d = e.dateAdd
             u.append({'userid': e.user_fk, 'title': e.title, 'text': e.text, 'dateAdd': str(d.strftime("%d.%m.%y %H:%M")) })
 

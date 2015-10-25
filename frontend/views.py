@@ -93,10 +93,13 @@ def entries():
             if res.status_code == 200:
                 data = json.loads(res.text)
                 body = json.dumps(data)
+                res_b1 = requests.get('http://localhost:8001/me/'+str(data['userid']), headers=headers)
                 res_b2 = requests.get('http://localhost:8002/entries/'+str(data['userid']), data=body, headers=headers)
 
                 data = json.loads(res_b2.text)
-                return render_template('entries.html', access=True, entries=data)
+                user = json.loads(res_b1.text)
+                #print "_____________ ", user[0]['username']
+                return render_template('entries.html', access=True, entries=data, user=user)
             else:
                 flash(json.loads(res.text)['error'])
         else:
@@ -159,7 +162,9 @@ def all():
 
                 r.append({'username': usr['username'], 'entry': entr})
 
-            return render_template('index.html', entries=r, access=True)
+            res_b1 = requests.get('http://localhost:8001/me/'+str(userid['userid']), headers=headers)
+            user = json.loads(res_b1.text)
+            return render_template('index.html', entries=r, user=user, access=True)
     else:
         return redirect('/logout')
 
