@@ -3,7 +3,7 @@ from flask import request, redirect, url_for, abort
 from sqlalchemy import desc
 import json
 
-from models import db, Entries
+from models import db, Post
 db.init_app(app)
 
 
@@ -12,15 +12,17 @@ db.init_app(app)
 def entries(userid=None):
     # userid = request.json.get('userid')
     if userid is not None:
-        entry = Entries.query.filter_by(user_fk=userid).all() #order_by(desc(Entries.entry_id))
+        entry = Post.query.filter_by(user_fk=userid).all() #order_by(desc(Entries.entry_id))
         # entry = db.session.query(Entries).order_by(Entries.entry_id.desc())
     else:
-        entry = Entries.query.filter_by().all()
+        entry = Post.query.filter_by().all()
 
     if entry is not None:
         u = []
         for e in entry:
-            u.append({'userid': e.user_fk, 'title': e.title, 'text': e.text})
+            print str(e.user_fk)+", "+e.title+", "+e.text+", "+str(e.dateAdd)+", "+str(e.dateDelete)
+            d = e.dateAdd
+            u.append({'userid': e.user_fk, 'title': e.title, 'text': e.text, 'dateAdd': str(d.strftime("%d.%m.%y %H:%M"))})
 
         code = 200
         data = u
@@ -43,7 +45,7 @@ def addentries():
         print "userid ", userid
         print "title ", title
         print "text ", text
-        query = Entries(userid, title, text)
+        query = Post(userid, title, text)
         db.session.add(query)
         db.session.commit()
         code = 200

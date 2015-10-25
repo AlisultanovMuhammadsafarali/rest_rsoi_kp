@@ -43,6 +43,10 @@ h2 {
     margin-left: -1em; 
 }
 
+.entries li h5 {
+    margin-left: 70%;
+}
+
 .add-entry { 
     font-size: 0.9em; 
     border-bottom: 1px solid #ccc; 
