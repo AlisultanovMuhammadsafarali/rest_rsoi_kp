@@ -80,3 +80,71 @@ h2 {
     padding: 10px 0px;
     clear: both;
 }
+
+.main_panel {
+    border-right: 1px solid #D9E1E7;
+    width: 447px;
+    padding: 5px 15px 6px 15px;
+}
+
+td, th {
+    display: table-cell;
+    vertical-align: inherit;
+}
+
+table {
+    display: table;
+    border-collapse: separate;
+    border-spacing: 2px;
+    border-color: grey;
+}
+
+#page_body {
+    font-size: 11px;
+    width: 631px;
+    padding: 0px 15px 0px 0px;
+}
+
+body {
+    background:  #fff;
+    color: #000;
+    margin: 0px;
+    padding: 0px;
+    direction: ltr;
+    font-family: tahoma, arial, verdana, sans-serif, Lucida Sans;
+    line-height: 1.182;
+    font-weight: normal;
+    -webkit-font-smoothing: subpixel-antialiased
+}
+
+#flat_button {
+    padding: 6px 16px 7px 16px;
+    margin: 0;
+    margin-left: 70%;
+    font-size: 11px;
+    display: inline-block;
+    zoom: 1;
+    cursor: pointer;
+    white-space: nowrap;
+    outline: none;
+    font-family: tahoma, arial, verdana, sans-serif, Lucida Sans;
+    vertical-align: top;
+    overflow: visible;
+    line-height: 13px;
+    text-decoration: none;
+    background: none;
+    background-color: #6383a8;
+    color: #FFF;
+    border: 0;
+    -webkit-border-radius: 2px;
+    -khtml-border-radius: 2px;
+    -moz-border-radius: 2px;
+    -ms-border-radius: 2px;
+    border-radius: 2px;
+    -webkit-transition: background-color 100ms ease-in-out;
+    -khtml-transition: background-color 100ms ease-in-out;
+    -moz-transition: background-color 100ms ease-in-out;
+    -ms-transition: background-color 100ms ease-in-out;
+    -o-transition: background-color 100ms ease-in-out;
+    transition: background-color 100ms ease-in-out;
+}

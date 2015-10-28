@@ -1,15 +1,20 @@
 {% extends "layout.html" %}
 {% block body %}
     {% for user in user_list %}
+    <tbody>
     <tr>
     <td class="main_panel"> 
         <div id="users_list">
             <div>
                 <div class="user_block">
-                    {{ user['user'] }}</td>
+                    {{ user['user'] }}
+                    <input id="flat_button" type="button" onclick="location.href='http://localhost:80';" value="Добавить в друзья" />
                 </div>
             </div>
         </div>
+
+    </td>
     </tr>
+    </tbody>
     {% endfor %}
 {% endblock %}
