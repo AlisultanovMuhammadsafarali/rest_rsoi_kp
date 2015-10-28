@@ -4,6 +4,8 @@ from flask import request, redirect, \
 import json, requests
 import viewEntries
 
+
+
 headers={'Content-Type': 'application/json'}
 
 
@@ -79,15 +81,15 @@ def friend():
 def users():
     res = check()
     if res.status_code == 200 and request.method == 'GET':
+        data = json.loads(res.text)
+        user = requests.get('http://localhost:8001/me/'+str(data['userid']), headers=headers)
+        user = json.loads(user.text)
         res_b1 = requests.get('http://localhost:8001/users/name', headers=headers)
         users = json.loads(res_b1.text)
 
         #print "________________ ", users[0]
-        # user = []
-        # for user in users:
-        #     user.append
 
-        return render_template('users.html', access=True, user_list=users) #jsonify({"users": users})
+        return render_template('users.html', access=True, user=user, user_list=users) #jsonify({"users": users})
 
     return "error"
 
