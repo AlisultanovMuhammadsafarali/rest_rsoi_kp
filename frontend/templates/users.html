@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block body %}
+    {% for user in user_list %}
+    <tr>
+    <td class="main_panel"> 
+        <div id="users_list">
+            <div>
+                <div class="user_block">
+                    {{ user['user'] }}</td>
+                </div>
+            </div>
+        </div>
+    </tr>
+    {% endfor %}
+{% endblock %}

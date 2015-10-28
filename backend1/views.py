@@ -1,8 +1,8 @@
 from backend1 import app
-from flask import request, redirect, url_for, abort
+from flask import request, redirect, url_for, abort, jsonify
 
 import json
-from models import db, Users
+from models import db, Users, Friends
 db.init_app(app)
 
 
@@ -37,6 +37,7 @@ def me(userid=None):
         else:
             me = Users.query.filter_by().all()
 
+        print "__________ ", me[0]
         if me is not None:
             u = []
             for user in me:
@@ -46,5 +47,49 @@ def me(userid=None):
         else:
             code=204
             data = {'error': {'code': code, 'message': 'No Content'}}
+
+    return json.dumps(data), code
+
+
+@app.route('/users/name', methods=['GET'])
+def users():
+    code = 400
+    if request.method == 'GET':
+        record = db.session.query(Users.name).all()
+        if record is not None:
+            code = 200
+            result = []
+            for r in record:
+                result.append({'user': r.name})
+            return json.dumps(result), code
+        else:
+            code = 204
+
+    return code
+
+
+@app.route('/friend/<int:userid>', methods=['GET'])
+@app.route('/friend/<int:userid>/<int:friendid>', methods=['POST'])
+def friend(userid=None, friendid=None):
+    code = 400
+    if request.method == 'GET':
+        if userid is not None:
+            record = Friends.query.filter_by(user_fk=userid).all()
+
+        if record is not None:
+            result = []
+            for r in record:
+                result.append({'userid': r.user_fk, 'friendid': r.friend_id, 'dateAdd': r.dateAddFriend})
+            code = 200
+            data = result
+        else:
+            code = 204
+
+    if request.method == 'POST':
+        if userid and friendid is not None:
+            record = Friends(userid, friendid)
+            db.session.add(record)
+            db.session.commit()
+            code = 200
 
     return json.dumps(data), code

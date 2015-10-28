@@ -21,3 +21,15 @@ class Users(db.Model):
 
     #def __repr__(self):
     #    return '<id: %d, userfk: %d, username: %s, useremail: %s, userphone: %s>' % (self.id, self.user_fk, self.name, self.email, self.phone)
+
+
+class Friends(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_fk = db.Column(db.Integer, index=True, nullable=False)
+    friend_id = db.Column(db.Integer, index=True, nullable=False)
+    dateAddFriend = db.Column(db.DateTime, index=True, nullable=False)
+
+    def __init__(self, userfk, friendid):
+        self.user_fk = userfk
+        self.friend_id = friendid
+        self.dateAddFriend = datetime.utcnow()

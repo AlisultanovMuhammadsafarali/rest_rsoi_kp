@@ -8,6 +8,8 @@
     <a href="{{ url_for('login') }}">log in</a>
     <a href="{{ url_for('signup') }}">sign up</a>
   {% else %}
+    <a href="{{ url_for('users') }}">users</a>
+    <a href="{{ url_for('friend') }}">friends</a>
     <a href="{{ url_for('logout') }}">log out</a>
     <table>
       <tr valign="top">
