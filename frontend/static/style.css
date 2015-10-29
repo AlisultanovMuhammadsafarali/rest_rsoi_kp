@@ -17,7 +17,7 @@ h1 {
 }
 
 h2 { 
-	font-size: 1.2em; 
+    font-size: 1em; 
 }
 
 .page { 
@@ -88,7 +88,7 @@ h2 {
 }
 
 td, th {
-    display: table-cell;
+    display: table-row;
     vertical-align: inherit;
 }
 

@@ -5,8 +5,13 @@
         <div id="users_list">
           <div>
             <div class="user_block">
-              {{ friend['username'], friend['email'], friend['phone'] }}
-
+              <table>
+                <tr valign="center">
+                  <td><h2>{{ friend['username'] }}</h2> </td>
+                  <td><h2>{{ friend['email'] }}</h2> </td>
+                  <td><h2>{{ friend['phone'] }}</h2> </td>
+                </tr>
+              </table>
             </div>
           </div>
         </div>
