@@ -3,6 +3,7 @@ from flask import request, redirect, url_for, abort, jsonify
 
 import json
 from models import db, Users, Friends
+
 db.init_app(app)
 
 
@@ -37,7 +38,7 @@ def me(userid=None):
         else:
             me = Users.query.filter_by().all()
 
-        print "__________ ", me[0]
+        #print "__________ ", me[0]
         if me is not None:
             u = []
             for user in me:
@@ -55,12 +56,12 @@ def me(userid=None):
 def users():
     code = 400
     if request.method == 'GET':
-        record = db.session.query(Users.name).all()
+        record = db.session.query(Users.user_fk, Users.name).all()
         if record is not None:
             code = 200
             result = []
             for r in record:
-                result.append({'user': r.name})
+                result.append({'userid':r.user_fk, 'user': r.name})
             return json.dumps(result), code
         else:
             code = 204
@@ -79,7 +80,8 @@ def friend(userid=None, friendid=None):
         if record is not None:
             result = []
             for r in record:
-                result.append({'userid': r.user_fk, 'friendid': r.friend_id, 'dateAdd': r.dateAddFriend})
+                d = r.dateAddFriend
+                result.append({'userid': r.user_fk, 'friendid': r.friend_id, 'dateAdd': str(d.strftime("%d.%m.%y %H:%M"))})
             code = 200
             data = result
         else:
@@ -87,6 +89,7 @@ def friend(userid=None, friendid=None):
 
     if request.method == 'POST':
         if userid and friendid is not None:
+            print "____________userid %d, ____________friendid %d", userid, friendid
             record = Friends(userid, friendid)
             db.session.add(record)
             db.session.commit()

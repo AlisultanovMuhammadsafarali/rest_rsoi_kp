@@ -1,13 +1,11 @@
 {% extends "layout.html" %}
 {% block body %}
-    <tbody>
-    <tr>
-    {% for user in user_list %}
+    {% for friend in friend_list %}
       <td class="main_panel"> 
         <div id="users_list">
           <div>
             <div class="user_block">
-              {{ user['user'] }}
+              {{ friend['user'] }}
               <form method=post action="{{ url_for('friend', userid=user['userid']) }}">
                 <input id="flat_button" type=submit value="Добавить в друзья"/>
 

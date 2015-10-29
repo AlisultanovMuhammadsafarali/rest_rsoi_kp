@@ -55,25 +55,33 @@ def check():
         return redirect('/logout')
 
 
-@app.route('/friend', methods=['POST', 'GET'])
-def friend():
+@app.route('/friend', methods=['GET', 'POST'])
+@app.route('/friend/<friendid>', methods=['POST', 'GET'])
+def friend(friendid=None):
     res = check()
     if res.status_code == 200:
-        data = json.loads(res.text)
-
+        res = json.loads(res.text)
         if request.method == 'GET':
-            res_b1 = requests.get('http://localhost:8001/friend/'+str(data['userid']), headers=headers)
+            res_b1 = requests.get('http://localhost:8001/friend/'+str(res['userid']), headers=headers)
             data = json.loads(res_b1.text)
-            print "________ ", data
-            return data#render_template('friend.html', access=True, friends=data)
+            print "____________ ", data
+            
+            # отплавить кучу id'шников и получить инфу по друзьям
+            user = requests.get('http://localhost:8001/me/'+str(res['userid']), headers=headers)
+            user = json.loads(user.text)
+            return render_template('friends.html', access=True, user=user, friend_list=data)
 
-        # if request.method == 'POST':
-        #    res_b1 = request.post('http://localhost:8001/friend/'+str(data['userid'])+'/'+str(data['friendid']), headers=headers)
-        #    data = json.login(res_b1.text)
-        #    return data[0]
+        if request.method == 'POST':
+            if 'userid' in request.args:
+                res_b1 = requests.post('http://localhost:8001/friend/'+str(res['userid'])+'/'+str(request.args['userid']), headers=headers)
+                flash("Ok")
+            else:
+                return "Not friendid"
 
     else:
         flash("error")
+
+    return redirect('/users')
 
 
 
@@ -81,8 +89,8 @@ def friend():
 def users():
     res = check()
     if res.status_code == 200 and request.method == 'GET':
-        data = json.loads(res.text)
-        user = requests.get('http://localhost:8001/me/'+str(data['userid']), headers=headers)
+        res = json.loads(res.text)
+        user = requests.get('http://localhost:8001/me/'+str(res['userid']), headers=headers)
         user = json.loads(user.text)
         res_b1 = requests.get('http://localhost:8001/users/name', headers=headers)
         users = json.loads(res_b1.text)
