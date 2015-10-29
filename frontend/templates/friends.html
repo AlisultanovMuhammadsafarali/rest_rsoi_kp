@@ -5,17 +5,8 @@
         <div id="users_list">
           <div>
             <div class="user_block">
-              {{ friend['user'] }}
-              <form method=post action="{{ url_for('friend', userid=user['userid']) }}">
-                <input id="flat_button" type=submit value="Добавить в друзья"/>
+              {{ friend['username'], friend['email'], friend['phone'] }}
 
-                <!-- <input type="hidden" name="userid" value="{{ user['userid'] }}"> -->
-              </form>
-              {% for message in get_flashed_messages() %}
-                <div class=flash>{{ message }}</div>
-              {% endfor %}
-
-              <!--<input id="flat_button" type="button" onclick="location.href='http://localhost:80';" value="Добавить в друзья" /> -->
             </div>
           </div>
         </div>

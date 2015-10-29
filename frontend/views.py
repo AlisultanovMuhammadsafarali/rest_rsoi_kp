@@ -64,9 +64,9 @@ def friend(friendid=None):
         if request.method == 'GET':
             res_b1 = requests.get('http://localhost:8001/friend/'+str(res['userid']), headers=headers)
             data = json.loads(res_b1.text)
-            print "____________ ", data
-            
-            # отплавить кучу id'шников и получить инфу по друзьям
+            # for d in data:
+            #     print "____________ ", d['friendid']
+
             user = requests.get('http://localhost:8001/me/'+str(res['userid']), headers=headers)
             user = json.loads(user.text)
             return render_template('friends.html', access=True, user=user, friend_list=data)

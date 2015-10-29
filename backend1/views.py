@@ -78,10 +78,21 @@ def friend(userid=None, friendid=None):
             record = Friends.query.filter_by(user_fk=userid).all()
 
         if record is not None:
-            result = []
+            listid = []
             for r in record:
-                d = r.dateAddFriend
-                result.append({'userid': r.user_fk, 'friendid': r.friend_id, 'dateAdd': str(d.strftime("%d.%m.%y %H:%M"))})
+                listid.append(r.friend_id)
+
+            res = db.session.query(Users).filter(Users.id.in_((listid))).all()
+
+            result = []
+            for r in res:
+                #print r.name, r.email
+                result.append({'username': r.name, 'email': r.email, 'phone': r.phone})
+
+            # result = []
+            # for r in record:
+            #     d = r.dateAddFriend
+            #     result.append({'userid': r.user_fk, 'friendid': r.friend_id, 'dateAdd': str(d.strftime("%d.%m.%y %H:%M"))})
             code = 200
             data = result
         else:
