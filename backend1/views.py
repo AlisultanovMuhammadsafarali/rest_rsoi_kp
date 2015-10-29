@@ -86,13 +86,8 @@ def friend(userid=None, friendid=None):
 
             result = []
             for r in res:
-                #print r.name, r.email
                 result.append({'username': r.name, 'email': r.email, 'phone': r.phone})
 
-            # result = []
-            # for r in record:
-            #     d = r.dateAddFriend
-            #     result.append({'userid': r.user_fk, 'friendid': r.friend_id, 'dateAdd': str(d.strftime("%d.%m.%y %H:%M"))})
             code = 200
             data = result
         else:
@@ -100,7 +95,6 @@ def friend(userid=None, friendid=None):
 
     if request.method == 'POST':
         if userid and friendid is not None:
-            print "____________userid %d, ____________friendid %d", userid, friendid
             record = Friends(userid, friendid)
             db.session.add(record)
             db.session.commit()
