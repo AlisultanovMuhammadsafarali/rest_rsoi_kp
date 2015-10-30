@@ -85,6 +85,8 @@ def friend(friendid=None):
 
 
 
+
+
 @app.route('/users', methods=['GET'])
 def users():
     res = check()
@@ -92,7 +94,8 @@ def users():
         res = json.loads(res.text)
         user = requests.get('http://localhost:8001/me/'+str(res['userid']), headers=headers)
         user = json.loads(user.text)
-        res_b1 = requests.get('http://localhost:8001/users/name', headers=headers)
+        print "OK"
+        res_b1 = requests.get('http://localhost:8001/users/1', headers=headers)
         users = json.loads(res_b1.text)
 
         #print "________________ ", users[0]

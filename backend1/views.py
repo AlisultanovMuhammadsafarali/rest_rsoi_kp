@@ -3,9 +3,13 @@ from flask import request, redirect, url_for, abort, jsonify
 
 import json
 from models import db, Users, Friends
+#from backend2.paginate import Pagination
+from flask.ext.sqlalchemy import Pagination
 
 db.init_app(app)
 
+
+PER_PAGE = 2
 
 @app.route('/signup', methods=['POST'])
 def signup():
@@ -52,21 +56,47 @@ def me(userid=None):
     return json.dumps(data), code
 
 
-@app.route('/users/name', methods=['GET'])
+#@app.route('/users/', defaults={'page': 1})
+@app.route('/users', methods=['GET'])
 def users():
     code = 400
-    if request.method == 'GET':
-        record = db.session.query(Users.user_fk, Users.name).all()
-        if record is not None:
+    if request.method == 'GET' and 'page' in request.args:
+        page = int(request.args['page'])
+        #record = db.session.query(Users.user_fk, Users.name).all()
+        count = Users.query.count()
+        record = Users.query.paginate(page, PER_PAGE, count)
+        items = record.items
+
+        if items is not None:
             code = 200
             result = []
-            for r in record:
-                result.append({'userid':r.user_fk, 'user': r.name})
+            for r in items:
+                print r
+                result.append({
+                                'page': record.page,
+                                'total': record.total,
+                                'items': {'userid':r.user_fk, 'user': r.name}
+                              })
             return json.dumps(result), code
         else:
             code = 204
 
     return code
+
+
+@app.route('/users1/', defaults={'page': 1})
+@app.route('/users1/page/<int:page>')
+def show_users(page):
+    count = Users.query.count()
+    users = Users.query.paginate(page, PER_PAGE, error_out=True)
+    if not users and page != 1:
+        abort(404)
+    pagination = Pagination(page, PER_PAGE, count)
+    return render_template('users1.html',
+        pagination=pagination,
+        users=users
+    )
+
 
 
 @app.route('/friend/<int:userid>', methods=['GET'])

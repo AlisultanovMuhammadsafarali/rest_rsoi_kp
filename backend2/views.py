@@ -4,6 +4,7 @@ from sqlalchemy import desc
 import json
 
 from models import db, Post, Comments
+from paginate import Pagination
 db.init_app(app)
 
 
