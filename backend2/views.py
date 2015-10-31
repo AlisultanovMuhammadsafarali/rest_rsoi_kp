@@ -4,37 +4,64 @@ from sqlalchemy import desc
 import json
 
 from models import db, Post, Comments
+from flask.ext.sqlalchemy import Pagination
+
 db.init_app(app)
 
-
-@app.route('/entries', methods=['GET'])
-@app.route('/entries/<int:userid>', methods=['GET', 'POST'])
-def entries(userid=None):
-    # userid = request.json.get('userid')
-    if userid is not None:
-        entry = Post.query.filter_by(user_fk=userid).all() #order_by(desc(Entries.entry_id))
-        # entry = db.session.query(Entries).order_by(Entries.entry_id.desc())
-    else:
-        entry = Post.query.filter_by().all()
-
-    if entry is not None:
-        u = []
-        for e in entry:
-            #print str(e.user_fk)+", "+e.title+", "+e.text+", "+str(e.dateAdd)+", "+str(e.dateDelete)
-            d = e.dateAdd
-            u.append({'userid': e.user_fk, 'title': e.title, 'text': e.text, 'dateAdd': str(d.strftime("%d.%m.%y %H:%M")) })
-
-        code = 200
-        data = u
-    else:
-        code=204
-        data = {'error': {'code': code, 'message': 'No Content'}}
-
-    return json.dumps(data), code
+PER_PAGE = 2
 
 
-@app.route('/entries/add', methods=['POST'])
-def addentries():
+@app.route('/posts', methods=['GET', 'POST'])
+def posts():
+    code = 400
+    if request.method == 'GET':
+        userid = int(request.json.get('userid'))
+        page = int(request.json.get('page'))
+        if userid and page is not None:
+            count = Post.query.count()
+            record = Post.query.filter_by(user_fk=userid).paginate(page, PER_PAGE, count)
+
+            # entry = Post.query.filter_by(user_fk=userid).all()
+            #example: order_by(desc(posts.entry_id))
+            # entry = db.session.query(posts).order_by(posts.entry_id.desc())
+        else:
+            code = 204
+            # entry = Post.query.filter_by().all()
+
+        items = record.items
+        if items is not None:
+            code = 200
+            result = []
+            for r in items:
+                d = r.dateAdd
+                result.append({'userid': r.user_fk, 'title': r.title, 'text': r.text, 'dateAdd': str(d.strftime("%d.%m.%y %H:%M"))})
+
+            result = {'page': record.page,
+                      'total': record.total,
+                      'pages': record.pages,
+                      'items': result}
+            return json.dumps(result), code
+
+        else:
+            code = 204
+    # if entry is not None:
+    #     u = []
+    #     for e in entry:
+    #         #print str(e.user_fk)+", "+e.title+", "+e.text+", "+str(e.dateAdd)+", "+str(e.dateDelete)
+    #         d = e.dateAdd
+    #         u.append({'userid': e.user_fk, 'title': e.title, 'text': e.text, 'dateAdd': str(d.strftime("%d.%m.%y %H:%M")) })
+
+    #     code = 200
+    #     data = u
+    # else:
+    #     code=204
+    #     data = {'error': {'code': code, 'message': 'No Content'}}
+
+    return code
+
+
+@app.route('/posts/add', methods=['POST'])
+def addposts():
     code = 400
     data = {'error': {'message': 'Bad request', 'information': 'Incorrect credentials'}}
     entry = request.json.get('entry')

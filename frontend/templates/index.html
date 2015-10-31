@@ -1,8 +1,8 @@
 {% extends "layout.html" %}
 {% block body %}
   {% if access %}
-      <ul class=entries>
-      {% for user in entries %}
+      <ul class=posts>
+      {% for user in posts %}
         <li><h2>{{ user['username'] }}</h2>
           {% for entry in user['entry'] %}
             <ul>
@@ -11,7 +11,7 @@
             </ul>
           {% endfor %}
       {% else %}
-        <li><em>Unbelievable.  No entries here so far</em>
+        <li><em>Unbelievable.  No posts here so far</em>
       {% endfor %}
       </ul>
   {% endif %}

@@ -6,33 +6,42 @@ import json, requests
 headers={'Content-Type': 'application/json'}
 
 
-@app.route('/entries', methods=['POST', 'GET'])
-def entries():
-    if request.method == 'GET':
-        key = request.cookies.get('key')
-        if key is not None:
-            body = json.dumps({'key': key})
-            res = requests.post('http://localhost:8003/status', data=body, headers=headers)
-            if res.status_code == 200:
-                data = json.loads(res.text)
-                body = json.dumps(data)
-                res_b1 = requests.get('http://localhost:8001/me/'+str(data['userid']), headers=headers)
-                res_b2 = requests.get('http://localhost:8002/entries/'+str(data['userid']), data=body, headers=headers)
-
-                data = json.loads(res_b2.text)
-                user = json.loads(res_b1.text)
-                #print "_____________ ", user[0]['username']
-                return render_template('entries.html', access=True, entries=data, user=user)
-            else:
-                flash(json.loads(res.text)['error'])
-        else:
-            return redirect('/logout')
-
-    return render_template('entries.html', access=True)
+def check():
+    key = request.cookies.get('key')
+    if key is not None:
+        body = json.dumps({'key': key})
+        res = requests.post('http://localhost:8003/status', data=body, headers=headers)
+        return res
+    else:
+        return redirect('/logout')
 
 
-@app.route('/entries/add', methods=['POST'])
-def addentries():
+@app.route('/posts', methods=['POST', 'GET'])
+def posts():
+    res = check()
+    if res.status_code == 200 and request.method == 'GET':
+        res = json.loads(res.text)
+        res_b1 = requests.get('http://localhost:8001/me/'+str(res['userid']), headers=headers)
+
+        page = 1
+        if 'page' in request.args:
+            page = request.args.get('page')
+
+        body = json.dumps({'page': page, 'userid': res['userid']})
+        res_b2 = requests.get('http://localhost:8002/posts', data=body, headers=headers)
+
+        res = json.loads(res_b2.text)
+        user = json.loads(res_b1.text)
+        #print "_____________ ", user[0]['username']
+        return render_template('posts.html', access=True, posts=res, user=user)
+    # else:
+    #     flash(json.loads(res.text)['error'])
+
+    # return render_template('posts.html', access=True)
+
+
+@app.route('/posts/add', methods=['POST'])
+def addposts():
     if request.method == 'POST':
         key = request.cookies.get('key')
         if key is not None:
@@ -43,23 +52,23 @@ def addentries():
                 text = request.form['text']
                 data = {'entry': {'userid': json.loads(res.text)['userid'], 'title': title, 'text': text}}
                 body = json.dumps(data)
-                res_b2 = requests.post('http://localhost:8002/entries/add', data=body, headers=headers)
+                res_b2 = requests.post('http://localhost:8002/posts/add', data=body, headers=headers)
                 if res_b2.status_code == 200:
                     flash('New entry was successfully posted')
                 else:
                     flash('failed add new entry')
 
-                return redirect('/entries')
+                return redirect('/posts')
             else:
                 flash(json.loads(res.text)['error'])
-                return redirect('/entries')
+                return redirect('/posts')
         else:
             return redirect('/logout')
 
-    return render_template('entries.html')
+    return render_template('posts.html')
 
 
-@app.route('/entries/allusers')
+@app.route('/posts/allusers')
 def all():
     key = request.cookies.get('key')
     if key is not None:
@@ -72,7 +81,7 @@ def all():
             if res_b1.status_code == 200:
                 datame = json.loads(res_b1.text)
 
-            res_b2 = requests.get('http://localhost:8002/entries', headers=headers)
+            res_b2 = requests.get('http://localhost:8002/posts', headers=headers)
             if res_b2.status_code == 200:
                 dataentry = json.loads(res_b2.text)
 
@@ -87,8 +96,8 @@ def all():
 
             res_b1 = requests.get('http://localhost:8001/me/'+str(userid['userid']), headers=headers)
             user = json.loads(res_b1.text)
-            return render_template('index.html', entries=r, user=user, access=True)
+            return render_template('index.html', posts=r, user=user, access=True)
     else:
         return redirect('/logout')
 
-    return redirect('/entries')
+    return redirect('/posts')

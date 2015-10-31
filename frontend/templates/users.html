@@ -10,12 +10,11 @@
         <div id="users_list">
           <div>
             <div class="user_block">
-              {{ user['user'] }}
+              {{ user.user }}
               <form method=post action="{{ url_for('friend', userid=user['userid']) }}">
                 <input id="flat_button" type=submit value="Добавить в друзья"/>
 
                 <!-- <input type="hidden" name="userid" value="{{ user['userid'] }}"> -->
-
               <!--<input id="flat_button" type="button" onclick="location.href='http://localhost:80';" value="Добавить в друзья" /> -->
               </form>
             </div>
@@ -29,12 +28,10 @@
 
     <form action="/users" method="get">
       {% if user_list['page'] > 1 %}
-      <a href="{{ url_for('users', page=user_list['page']-1)}}">&lt;&lt; prev</a>
-      <!-- <a href="/users?page="user_list['page']-1>&lt;&lt; prev</a> -->
-      <!-- <input type="submit" name="page" value=user_list['page']-1 /> -->
+      <a href="{{ url_for('users', page=user_list.page-1)}}">&lt;&lt; prev</a>
       {% else %}&lt;&lt; prev{% endif %} |
       {% if user_list['page'] < user_list['pages'] %}
-      <a href="{{ url_for('users', page=user_list['page']+1) }}"> next &gt;&gt;</a>
+      <a href="{{ url_for('users', page=user_list.page+1) }}"> next &gt;&gt;</a>
       {% else %} next &gt;&gt;{% endif %}
     </form>
     </tbody>

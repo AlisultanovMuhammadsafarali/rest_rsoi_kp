@@ -3,7 +3,7 @@ from flask import request, redirect, \
                   render_template, flash, make_response, jsonify
 import json, requests
 import viewEntries
-
+from viewEntries import check
 
 
 headers={'Content-Type': 'application/json'}
@@ -18,7 +18,7 @@ def index():
         body = json.dumps({'key': key})
         res = requests.post('http://localhost:8003/status', data=body, headers=headers)
         if res.status_code == 200:
-            response = redirect('/entries')
+            response = redirect('/posts')
 
     return response
 
@@ -30,7 +30,7 @@ def login():
         res = requests.get('http://localhost:8003/login', data=body, headers=headers)
         if res.status_code == 200:
             data = json.loads(res.text)
-            response = redirect('/entries')
+            response = redirect('/posts')
             response.set_cookie('key', value=data['key'])
 
             return response
@@ -43,16 +43,6 @@ def logout():
     response = make_response(render_template('login.html', access=False))
     response.delete_cookie('key')
     return response
-
-
-def check():
-    key = request.cookies.get('key')
-    if key is not None:
-        body = json.dumps({'key': key})
-        res = requests.post('http://localhost:8003/status', data=body, headers=headers)
-        return res
-    else:
-        return redirect('/logout')
 
 
 @app.route('/friend', methods=['GET', 'POST'])
@@ -86,14 +76,7 @@ def friend(friendid=None):
 
 
 @app.route('/users', methods=['GET'])
-# @app.route('/users/<int:page>', methods=['GET'])
 def users():
-    # if page is None:
-    #     page = 1
-    #     return 'page = ', page
-    # else:
-    #     return 'faile'
-
     res = check()
     if res.status_code == 200 and request.method == 'GET':
         res = json.loads(res.text)
@@ -108,12 +91,7 @@ def users():
         res_b1 = requests.get('http://localhost:8001/users', data=body, headers=headers)
         users = json.loads(res_b1.text)
 
-        # print 'page='+str(users['page'])+', total='+str(users['total'])
-        # for r in users['items']:
-        #     print r
-
-
-        return render_template('users.html', access=True, data=body, user=user, user_list=users) #jsonify({"users": users})
+        return render_template('users.html', access=True, data=body, user=user, user_list=users)
 
     return "error"
 
