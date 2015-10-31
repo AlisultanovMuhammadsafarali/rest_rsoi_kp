@@ -85,22 +85,35 @@ def friend(friendid=None):
 
 
 
-
-
 @app.route('/users', methods=['GET'])
+# @app.route('/users/<int:page>', methods=['GET'])
 def users():
+    # if page is None:
+    #     page = 1
+    #     return 'page = ', page
+    # else:
+    #     return 'faile'
+
     res = check()
     if res.status_code == 200 and request.method == 'GET':
         res = json.loads(res.text)
         user = requests.get('http://localhost:8001/me/'+str(res['userid']), headers=headers)
         user = json.loads(user.text)
-        print "OK"
-        res_b1 = requests.get('http://localhost:8001/users/1', headers=headers)
+
+        page = 1
+        if 'page' in request.args:
+            page = request.args.get('page')
+
+        body = json.dumps({'page': page})
+        res_b1 = requests.get('http://localhost:8001/users', data=body, headers=headers)
         users = json.loads(res_b1.text)
 
-        #print "________________ ", users[0]
+        # print 'page='+str(users['page'])+', total='+str(users['total'])
+        # for r in users['items']:
+        #     print r
 
-        return render_template('users.html', access=True, user=user, user_list=users) #jsonify({"users": users})
+
+        return render_template('users.html', access=True, data=body, user=user, user_list=users) #jsonify({"users": users})
 
     return "error"
 

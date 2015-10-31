@@ -5,7 +5,7 @@
     {% for message in get_flashed_messages() %}
       <div class=flash>{{ message }}</div>
     {% endfor %}
-    {% for user in user_list %}
+    {% for user in user_list['items'] %}
       <td class="main_panel"> 
         <div id="users_list">
           <div>
@@ -25,5 +25,17 @@
       </td>
     {% endfor %}
     </tr>
+
+
+    <form action="/users" method="get">
+      {% if user_list['page'] > 1 %}
+      <a href="{{ url_for('users', page=user_list['page']-1)}}">&lt;&lt; prev</a>
+      <!-- <a href="/users?page="user_list['page']-1>&lt;&lt; prev</a> -->
+      <!-- <input type="submit" name="page" value=user_list['page']-1 /> -->
+      {% else %}&lt;&lt; prev{% endif %} |
+      {% if user_list['page'] < user_list['pages'] %}
+      <a href="{{ url_for('users', page=user_list['page']+1) }}"> next &gt;&gt;</a>
+      {% else %} next &gt;&gt;{% endif %}
+    </form>
     </tbody>
 {% endblock %}

@@ -1,9 +1,8 @@
 from backend1 import app
-from flask import request, redirect, url_for, abort, jsonify
+from flask import request, render_template, redirect, url_for, abort, jsonify
 
 import json
 from models import db, Users, Friends
-#from backend2.paginate import Pagination
 from flask.ext.sqlalchemy import Pagination
 
 db.init_app(app)
@@ -56,27 +55,27 @@ def me(userid=None):
     return json.dumps(data), code
 
 
-#@app.route('/users/', defaults={'page': 1})
 @app.route('/users', methods=['GET'])
 def users():
     code = 400
-    if request.method == 'GET' and 'page' in request.args:
-        page = int(request.args['page'])
+    if request.method == 'GET':
+        page = int(request.json.get('page')) #int(request.args['page'])
         #record = db.session.query(Users.user_fk, Users.name).all()
         count = Users.query.count()
         record = Users.query.paginate(page, PER_PAGE, count)
-        items = record.items
 
+        items = record.items
+        # return render_template('users1.html', pagination=record)
         if items is not None:
             code = 200
             result = []
             for r in items:
-                print r
-                result.append({
-                                'page': record.page,
-                                'total': record.total,
-                                'items': {'userid':r.user_fk, 'user': r.name}
-                              })
+                result.append({'userid':r.user_fk, 'user': r.name})
+
+            result = {'page': record.page,
+                      'total': record.total,
+                      'pages': record.pages,
+                      'items': result}
             return json.dumps(result), code
         else:
             code = 204
