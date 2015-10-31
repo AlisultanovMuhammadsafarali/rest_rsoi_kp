@@ -3,8 +3,10 @@ from flask import request, redirect, \
                   render_template, flash, make_response
 import json, requests
 
+
 headers={'Content-Type': 'application/json'}
 
+app.config['PROPAGATE_EXCEPTIONS'] = True
 
 def check():
     key = request.cookies.get('key')
@@ -22,6 +24,9 @@ def posts():
     if res.status_code == 200 and request.method == 'GET':
         res = json.loads(res.text)
         res_b1 = requests.get('http://localhost:8001/me/'+str(res['userid']), headers=headers)
+        if res_b1.status_code != 200:
+            return render_template('layout.html', access=True, status=False)
+        user = json.loads(res_b1.text)
 
         page = 1
         if 'page' in request.args:
@@ -29,15 +34,12 @@ def posts():
 
         body = json.dumps({'page': page, 'userid': res['userid']})
         res_b2 = requests.get('http://localhost:8002/posts', data=body, headers=headers)
+        status = False
+        if res_b2.status_code == 200:
+            res = json.loads(res_b2.text)
+            status = True
 
-        res = json.loads(res_b2.text)
-        user = json.loads(res_b1.text)
-        #print "_____________ ", user[0]['username']
-        return render_template('posts.html', access=True, posts=res, user=user)
-    # else:
-    #     flash(json.loads(res.text)['error'])
-
-    # return render_template('posts.html', access=True)
+        return render_template('posts.html', access=True, posts=res, user=user, status=status)
 
 
 @app.route('/posts/add', methods=['POST'])

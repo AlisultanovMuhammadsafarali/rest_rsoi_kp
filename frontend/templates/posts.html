@@ -1,6 +1,9 @@
 {% extends "layout.html" %}
 {% block body %}
-  {% if access %}
+{% if not status %}
+  <h4>this server is unavailable</h4>
+{% endif %}
+{% if status %}
     <form action="{{ url_for('all')}}" method=get class=posts>
       <dl>
         <dd><input type=submit value=All>
@@ -15,21 +18,22 @@
         <dd><input type=submit value=Share>
       </dl>
     </form>
-  {% endif %}
-  <ul class=posts>
-  {% for entry in posts['items'] %}
-    <li><h2>{{ entry.title }}</h2>{{ entry.text|safe }} <h5>{{ entry.dateAdd }}</h5>
-  {% else %}
-    <li><em>Unbelievable.  No posts here so far</em>
-  {% endfor %}
-  </ul>
-  
-  <!-- <form action="/posts" method="get"> -->
-  {% if posts['page'] > 1 %}
-  <a href="{{ url_for('posts', page=posts.page-1)}}">&lt;&lt; prev</a>
-  {% else %}&lt;&lt; prev{% endif %} |
-  {% if posts['page'] < posts['pages'] %}
-  <a href="{{ url_for('posts', page=posts.page+1) }}"> next &gt;&gt;</a>
-  {% else %} next &gt;&gt;{% endif %}
-<!-- </form> -->
+
+    <ul class=posts>
+    {% for entry in posts['items'] %}
+      <li><h2>{{ entry.title }}</h2>{{ entry.text|safe }} <h5>{{ entry.dateAdd }}</h5>
+    {% else %}
+      <li><em>Unbelievable.  No posts here so far</em>
+    {% endfor %}
+    </ul>
+    
+    {% if posts['page'] > 1 %}
+    <a href="{{ url_for('posts', page=posts.page-1)}}">&lt;&lt; prev</a>
+    {% else %}&lt;&lt; prev{% endif %} |
+    {% if posts['page'] < posts['pages'] %}
+    <a href="{{ url_for('posts', page=posts.page+1) }}"> next &gt;&gt;</a>
+    {% else %} next &gt;&gt;{% endif %}
+
+{% endif %}
+
 {% endblock %}
