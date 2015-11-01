@@ -3,4 +3,4 @@ from flask import Flask
 app = Flask(__name__)
 app.config.from_object('config_f1')
 
-from frontend import views
+from frontend import views, viewEntries

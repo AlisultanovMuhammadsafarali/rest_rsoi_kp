@@ -18,8 +18,18 @@
     </form>
 
     <ul class=posts>
+
     {% for entry in posts['items'] %}
       <li><h2>{{ entry.title }}</h2>{{ entry.text|safe }} <h5>{{ entry.dateAdd }}</h5>
+
+      <form action="{{ url_for('addcomments', postid=entry.postid) }}" method=post class=add-entry>
+        <dl>
+          <dt>Comment:
+          <dd><textarea name=text rows=1 cols=40></textarea>
+          <dd><input type=submit value=Share>
+        </dl>
+      </form>
+
     {% else %}
       <li><em>Unbelievable.  No posts here so far</em>
     {% endfor %}

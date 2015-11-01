@@ -2,20 +2,12 @@ from frontend import app
 from flask import request, redirect, \
                   render_template, flash, make_response
 import json, requests
+from views import check
 
 
 headers={'Content-Type': 'application/json'}
 
 app.config['PROPAGATE_EXCEPTIONS'] = True
-
-def check():
-    key = request.cookies.get('key')
-    if key is not None:
-        body = json.dumps({'key': key})
-        res = requests.post('http://localhost:8003/status', data=body, headers=headers)
-        return res
-    else:
-        return redirect('/logout')
 
 
 @app.route('/posts', methods=['POST', 'GET'])
@@ -23,7 +15,11 @@ def posts():
     res = check()
     if res.status_code == 200 and request.method == 'GET':
         res = json.loads(res.text)
-        res_b1 = requests.get('http://localhost:8001/me/'+str(res['userid']), headers=headers)
+        userid = res['userid']
+        if 'userid' in request.args:
+            userid = request.args['userid']
+
+        res_b1 = requests.get('http://localhost:8001/me/'+str(userid), headers=headers)
         status = {'user_status_code': True, 'post_status_code': False}
         if res_b1.status_code != 200:
             status['user_status_code'] = False
@@ -34,13 +30,30 @@ def posts():
         if 'page' in request.args:
             page = request.args.get('page')
 
-        body = json.dumps({'page': page, 'userid': res['userid']})
+        body = json.dumps({'page': page, 'userid': userid})
         res_b2 = requests.get('http://localhost:8002/posts', data=body, headers=headers)
         status['post_status_code'] = False
         if res_b2.status_code == 200:
             res = json.loads(res_b2.text)
             status['post_status_code'] = True
         return render_template('posts.html', access=True, posts=res, user=user, status=status)
+
+    return redirect('index')
+
+
+@app.route('/comments/add', methods=['GET', 'POST'])
+def addcomments():
+    res = check()
+    if res.status_code == 200 and request.method == 'POST':
+        res = json.loads(res.text)
+        res_b1 = requests.get('http://localhost:8001/me/'+str(res['userid']), headers=headers)
+        status = {'user_status_code': True, 'post_status_code': False}
+        if res_b1.status_code != 200:
+            status['user_status_code'] = False
+            return render_template('layout.html', access=True, status=status)
+        user = json.loads(res_b1.text)
+
+
 
     return redirect('index')
 

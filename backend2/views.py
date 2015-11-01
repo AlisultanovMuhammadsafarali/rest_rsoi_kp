@@ -31,7 +31,7 @@ def posts():
                 result = []
                 for r in items:
                     d = r.dateAdd
-                    result.append({'userid': r.user_fk, 'title': r.title, 'text': r.text, 'dateAdd': str(d.strftime("%d.%m.%y %H:%M"))})
+                    result.append({'userid': r.user_fk, 'postid': r.id, 'title': r.title, 'text': r.text, 'dateAdd': str(d.strftime("%d.%m.%y %H:%M"))})
 
                 result = {'page': record.page,
                           'total': record.total,

@@ -2,8 +2,6 @@ from frontend import app
 from flask import request, redirect, \
                   render_template, flash, make_response, jsonify
 import json, requests
-import viewEntries
-from viewEntries import check
 
 
 headers={'Content-Type': 'application/json'}
@@ -43,6 +41,16 @@ def logout():
     response = make_response(render_template('login.html', access=False))
     response.delete_cookie('key')
     return response
+
+
+def check():
+    key = request.cookies.get('key')
+    if key is not None:
+        body = json.dumps({'key': key})
+        res = requests.post('http://localhost:8003/status', data=body, headers=headers)
+        return res
+    else:
+        return redirect('/logout')
 
 
 @app.route('/friends', methods=['POST', 'GET'])
