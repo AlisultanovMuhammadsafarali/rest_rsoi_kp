@@ -18,8 +18,9 @@ def posts():
         res = json.loads(res.text)
         userid = res['userid']
         if 'userid' in request.args:
-            status['permission_add_post_code'] = False
-            userid = request.args['userid']
+            if int(request.args['userid']) != int(userid):
+                status['permission_add_post_code'] = False
+                userid = request.args['userid']
 
         res_b1 = requests.get('http://localhost:8001/me/'+str(userid), headers=headers)
         
