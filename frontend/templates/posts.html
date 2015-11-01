@@ -25,6 +25,7 @@
       <li><h2>{{ entry.title }}</h2>{{ entry.text|safe }} 
       <h5>{{ entry.dateAdd }}</h5>
 
+      {% if status.permission_add_comment_code %}
       <form action="{{ url_for('addcomments', postid=entry.postid) }}" method=post class=add-entry>
         <dl>
           <dt>Comment:
@@ -32,6 +33,7 @@
           <dd><input type=submit value=Share>
         </dl>
       </form>
+      {% endif %}
 
     {% else %}
       <li><em>Unbelievable.  No posts here so far</em>

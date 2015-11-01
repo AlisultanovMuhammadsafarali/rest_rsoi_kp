@@ -4,6 +4,7 @@ from flask import request, render_template, redirect, url_for, abort, jsonify
 import json
 from models import db, Users, Friends
 from flask.ext.sqlalchemy import Pagination
+from sqlalchemy import literal
 
 db.init_app(app)
 
@@ -26,7 +27,7 @@ def signup():
             code = 200
             data = {'message': 'ok'}
 
-    return json.dumps(data), code
+    return json.dumps(data, code)
 
 
 @app.route('/me', methods=['GET'])
@@ -52,7 +53,7 @@ def me(userid=None):
             code=204
             data = {'error': {'code': code, 'message': 'No Content'}}
 
-    return json.dumps(data), code
+    return json.dumps(data, code)
 
 
 @app.route('/users', methods=['GET'])
@@ -66,7 +67,7 @@ def users():
             record = Users.query.paginate(page, PER_PAGE, count)
         else:
             code = 204
-            return code
+            return json.dumps(code)
 
         if record is not None:
             items = record.items
@@ -80,13 +81,13 @@ def users():
                           'total': record.total,
                           'pages': record.pages,
                           'items': result}
-                return json.dumps(result), code
+                return json.dumps(result, code)
             else:
                 code = 204
         else:
             code = 204
 
-    return code
+    return json.dumps(code)
 
 
 @app.route('/friend', methods=['GET'])
@@ -94,36 +95,40 @@ def users():
 def friend(userid=None, friendid=None):
     code = 400
     if request.method == 'GET':
+        code = 204
         userid = int(request.json.get('userid'))
         page = int(request.json.get('page'))
         if userid and page is not None:
             count = Friends.query.count()
             record = Friends.query.filter_by(user_fk=userid).paginate(page, PER_PAGE, count)
         else:
-            code = 204
-            return code
+            return json.dumps(code)
 
         if record is not None:
             listid = []
             items = record.items
             for r in items:
                 listid.append(r.friend_id)
-            res = db.session.query(Users).filter(Users.id.in_((listid))).all()
 
-            if res is not None:
-                code = 200
-                result = []
-                for r in res:
-                    result.append({'username': r.name, 'email': r.email, 'phone': r.phone})
-                result = {'page': record.page,
-                          'total': record.total,
-                          'pages': record.pages,
-                          'items': result}
-                return json.dumps(result), code
-            else:
-                code = 204
-        else:
-            code = 204
+            result = []
+            result = {'page': 1,
+                      'total': 0,
+                      'pages': 1,
+                      'items': result}
+            if len(listid) > 0:
+                res = db.session.query(Users).filter(Users.id.in_((listid))).all()
+
+                if res is not None:
+                    code = 200
+                    result = []
+                    for r in res:
+                        result.append({'username': r.name, 'email': r.email, 'phone': r.phone})
+                    result = {'page': record.page,
+                              'total': record.total,
+                              'pages': record.pages,
+                              'items': result}
+
+            return json.dumps(result, code)
 
     if request.method == 'POST':
         if userid and friendid is not None:
@@ -132,4 +137,26 @@ def friend(userid=None, friendid=None):
             db.session.commit()
             code = 200
 
-    return code
+    return json.dumps(code)
+
+
+@app.route('/isfriend', methods=['GET'])
+def isfriend():
+    code = 400
+    if request.method == 'GET':
+        userid = int(request.json.get('userid'))
+        friendid = int(request.json.get('friendid'))
+        if userid and friendid is not None:
+            q = Friends.query.filter_by(user_fk=userid, friend_id=friendid)
+            t = db.session.query(literal(True)).filter(q.exists()).scalar()
+
+            code = 200
+            if t is True:
+                return json.dumps(True, code)
+            else:
+                return json.dumps(False, code)
+        else:
+            code = 204
+            return json.dumps(code)
+
+    return json.dumps(code)
