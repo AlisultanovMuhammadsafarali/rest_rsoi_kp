@@ -1,9 +1,7 @@
 {% extends "layout.html" %}
 {% block body %}
-{% if not status %}
-  <h4>this server is unavailable</h4>
-{% endif %}
-{% if status %}
+
+{% if status.post_status_code %}
     <form action="{{ url_for('all')}}" method=get class=posts>
       <dl>
         <dd><input type=submit value=All>
@@ -27,12 +25,15 @@
     {% endfor %}
     </ul>
     
-    {% if posts['page'] > 1 %}
+    {% if posts.page > 1 %}
     <a href="{{ url_for('posts', page=posts.page-1)}}">&lt;&lt; prev</a>
     {% else %}&lt;&lt; prev{% endif %} |
-    {% if posts['page'] < posts['pages'] %}
+    {% if posts.page < posts.pages %}
     <a href="{{ url_for('posts', page=posts.page+1) }}"> next &gt;&gt;</a>
     {% else %} next &gt;&gt;{% endif %}
+
+{% else %}
+  <h4>this server is unavailable</h4>
 
 {% endif %}
 

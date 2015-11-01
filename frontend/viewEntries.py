@@ -24,8 +24,10 @@ def posts():
     if res.status_code == 200 and request.method == 'GET':
         res = json.loads(res.text)
         res_b1 = requests.get('http://localhost:8001/me/'+str(res['userid']), headers=headers)
+        status = {'user_status_code': True, 'post_status_code': False}
         if res_b1.status_code != 200:
-            return render_template('layout.html', access=True, status=False)
+            status['user_status_code'] = False
+            return render_template('layout.html', access=True, status=status)
         user = json.loads(res_b1.text)
 
         page = 1
@@ -34,12 +36,13 @@ def posts():
 
         body = json.dumps({'page': page, 'userid': res['userid']})
         res_b2 = requests.get('http://localhost:8002/posts', data=body, headers=headers)
-        status = False
+        status['post_status_code'] = False
         if res_b2.status_code == 200:
             res = json.loads(res_b2.text)
-            status = True
-
+            status['post_status_code'] = True
         return render_template('posts.html', access=True, posts=res, user=user, status=status)
+
+    return redirect('index')
 
 
 @app.route('/posts/add', methods=['POST'])

@@ -10,11 +10,11 @@
   {% else %}
     <a href="{{ url_for('posts') }}">mypage</a>
     <a href="{{ url_for('users') }}">users</a>
-    <a href="{{ url_for('friend') }}">friends</a>
+    <a href="{{ url_for('friends') }}">friends</a>
     <a href="{{ url_for('logout') }}">log out</a>
     <table>
       <tr valign="top">
-        {% if status %}
+        {% if status.user_status_code %}
           <td><h2>{{ user[0]['username'] }}</h2> </td>
         {% else %}
           <h4>this server is unavailable</h4>

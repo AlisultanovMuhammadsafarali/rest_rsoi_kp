@@ -60,65 +60,68 @@ def users():
     code = 400
     if request.method == 'GET':
         page = int(request.json.get('page')) #int(request.args['page'])
-        #record = db.session.query(Users.user_fk, Users.name).all()
-        count = Users.query.count()
-        record = Users.query.paginate(page, PER_PAGE, count)
+        if page is not None:
+            #record = db.session.query(Users.user_fk, Users.name).all()
+            count = Users.query.count()
+            record = Users.query.paginate(page, PER_PAGE, count)
+        else:
+            code = 204
+            return code
 
-        items = record.items
-        # return render_template('users1.html', pagination=record)
-        if items is not None:
-            code = 200
-            result = []
-            for r in items:
-                result.append({'userid':r.user_fk, 'user': r.name})
+        if record is not None:
+            items = record.items
+            if items is not None:
+                code = 200
+                result = []
+                for r in items:
+                    result.append({'userid':r.user_fk, 'user': r.name})
 
-            result = {'page': record.page,
-                      'total': record.total,
-                      'pages': record.pages,
-                      'items': result}
-            return json.dumps(result), code
+                result = {'page': record.page,
+                          'total': record.total,
+                          'pages': record.pages,
+                          'items': result}
+                return json.dumps(result), code
+            else:
+                code = 204
         else:
             code = 204
 
     return code
 
 
-@app.route('/users1/', defaults={'page': 1})
-@app.route('/users1/page/<int:page>')
-def show_users(page):
-    count = Users.query.count()
-    users = Users.query.paginate(page, PER_PAGE, error_out=True)
-    if not users and page != 1:
-        abort(404)
-    pagination = Pagination(page, PER_PAGE, count)
-    return render_template('users1.html',
-        pagination=pagination,
-        users=users
-    )
-
-
-
-@app.route('/friend/<int:userid>', methods=['GET'])
+@app.route('/friend', methods=['GET'])
 @app.route('/friend/<int:userid>/<int:friendid>', methods=['POST'])
 def friend(userid=None, friendid=None):
     code = 400
     if request.method == 'GET':
-        if userid is not None:
-            record = Friends.query.filter_by(user_fk=userid).all()
+        userid = int(request.json.get('userid'))
+        page = int(request.json.get('page'))
+        if userid and page is not None:
+            count = Friends.query.count()
+            record = Friends.query.filter_by(user_fk=userid).paginate(page, PER_PAGE, count)
+        else:
+            code = 204
+            return code
 
         if record is not None:
             listid = []
-            for r in record:
+            items = record.items
+            for r in items:
                 listid.append(r.friend_id)
-
             res = db.session.query(Users).filter(Users.id.in_((listid))).all()
 
-            result = []
-            for r in res:
-                result.append({'username': r.name, 'email': r.email, 'phone': r.phone})
-
-            code = 200
-            data = result
+            if res is not None:
+                code = 200
+                result = []
+                for r in res:
+                    result.append({'username': r.name, 'email': r.email, 'phone': r.phone})
+                result = {'page': record.page,
+                          'total': record.total,
+                          'pages': record.pages,
+                          'items': result}
+                return json.dumps(result), code
+            else:
+                code = 204
         else:
             code = 204
 
@@ -129,4 +132,4 @@ def friend(userid=None, friendid=None):
             db.session.commit()
             code = 200
 
-    return json.dumps(data), code
+    return code

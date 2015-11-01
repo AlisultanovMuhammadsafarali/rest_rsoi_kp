@@ -1,6 +1,9 @@
 {% extends "layout.html" %}
 {% block body %}
-    <tbody>
+
+<tbody>
+{% if status.users_status_code %}
+
     <tr>
     {% for message in get_flashed_messages() %}
       <div class=flash>{{ message }}</div>
@@ -11,7 +14,7 @@
           <div>
             <div class="user_block">
               {{ user.user }}
-              <form method=post action="{{ url_for('friend', userid=user['userid']) }}">
+              <form method=get action="{{ url_for('friends', userid=user['userid']) }}">
                 <input id="flat_button" type=submit value="Добавить в друзья"/>
 
                 <!-- <input type="hidden" name="userid" value="{{ user['userid'] }}"> -->
@@ -25,14 +28,17 @@
     {% endfor %}
     </tr>
 
+    {% if user_list.page > 1 %}
+    <a href="{{ url_for('users', page=user_list.page-1)}}">&lt;&lt; prev</a>
+    {% else %}&lt;&lt; prev{% endif %} |
+    {% if user_list.page < user_list.pages %}
+    <a href="{{ url_for('users', page=user_list.page+1) }}"> next &gt;&gt;</a>
+    {% else %} next &gt;&gt;{% endif %}
 
-    <form action="/users" method="get">
-      {% if user_list['page'] > 1 %}
-      <a href="{{ url_for('users', page=user_list.page-1)}}">&lt;&lt; prev</a>
-      {% else %}&lt;&lt; prev{% endif %} |
-      {% if user_list['page'] < user_list['pages'] %}
-      <a href="{{ url_for('users', page=user_list.page+1) }}"> next &gt;&gt;</a>
-      {% else %} next &gt;&gt;{% endif %}
-    </form>
-    </tbody>
+{% else %}
+    <h4>this server is unavailable</h4>
+
+{% endif %}
+</tbody>
+
 {% endblock %}

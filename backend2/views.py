@@ -20,24 +20,26 @@ def posts():
         if userid and page is not None:
             count = Post.query.count()
             record = Post.query.filter_by(user_fk=userid).paginate(page, PER_PAGE, count)
-
         else:
             code = 204
+            return code
 
-        items = record.items
-        if items is not None:
-            code = 200
-            result = []
-            for r in items:
-                d = r.dateAdd
-                result.append({'userid': r.user_fk, 'title': r.title, 'text': r.text, 'dateAdd': str(d.strftime("%d.%m.%y %H:%M"))})
+        if record is not None:
+            items = record.items
+            if items is not None:
+                code = 200
+                result = []
+                for r in items:
+                    d = r.dateAdd
+                    result.append({'userid': r.user_fk, 'title': r.title, 'text': r.text, 'dateAdd': str(d.strftime("%d.%m.%y %H:%M"))})
 
-            result = {'page': record.page,
-                      'total': record.total,
-                      'pages': record.pages,
-                      'items': result}
-            return json.dumps(result), code
-
+                result = {'page': record.page,
+                          'total': record.total,
+                          'pages': record.pages,
+                          'items': result}
+                return json.dumps(result), code
+            else:
+                code = 204
         else:
             code = 204
 

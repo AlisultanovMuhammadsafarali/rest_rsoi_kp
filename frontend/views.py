@@ -45,43 +45,53 @@ def logout():
     return response
 
 
-@app.route('/friend', methods=['GET', 'POST'])
-@app.route('/friend/<friendid>', methods=['POST', 'GET'])
-def friend(friendid=None):
+@app.route('/friends', methods=['POST', 'GET'])
+@app.route('/friends/<friendid>', methods=['POST', 'GET'])
+def friends(friendid=None):
     res = check()
-    if res.status_code == 200:
+    if res.status_code == 200 and request.method == 'GET':
         res = json.loads(res.text)
-        if request.method == 'GET':
-            res_b1 = requests.get('http://localhost:8001/friend/'+str(res['userid']), headers=headers)
-            data = json.loads(res_b1.text)
-            # for d in data:
-            #     print "____________ ", d['friendid']
+        res_b1 = requests.get('http://localhost:8001/me/'+str(res['userid']), headers=headers)
+        status = {'user_status_code': True, 'friends_status_code': False}
+        if res_b1.status_code != 200:
+            status['user_status_code'] = False
+            return render_template('layout.html', access=True, status=status)
+        user = json.loads(res_b1.text)
 
-            user = requests.get('http://localhost:8001/me/'+str(res['userid']), headers=headers)
-            user = json.loads(user.text)
-            return render_template('friends.html', access=True, user=user, friend_list=data)
+        page = 1
+        if 'page' in request.args:
+            page = request.args.get('page')
 
-        if request.method == 'POST':
-            if 'userid' in request.args:
-                res_b1 = requests.post('http://localhost:8001/friend/'+str(res['userid'])+'/'+str(request.args['userid']), headers=headers)
-                flash("Ok")
-            else:
-                return "Not friendid"
+        body = json.dumps({'page': page, 'userid': res['userid']})
+        friends = requests.get('http://localhost:8001/friend', data=body, headers=headers)
+        status['friends_status_code'] = False
+        if friends.status_code == 200:
+            res = json.loads(friends.text)
+            status['friends_status_code'] = True
+        return render_template('friends.html', access=True, friend_list=res, user=user, status=status)
 
-    else:
-        flash("error")
+    if res.status_code == 200 and request.method == 'POST':
+        if 'userid' in request.args:
+            res_b1 = requests.post('http://localhost:8001/friend/'+str(res['userid'])+'/'+str(request.args['userid']), headers=headers)
+            flash("Ok")
+        else:
+            return "Not friendid"
 
-    return redirect('/users')
+    return redirect('/index')
 
 
 
-@app.route('/users', methods=['GET'])
+@app.route('/users', methods=['GET', 'POST'])
 def users():
     res = check()
     if res.status_code == 200 and request.method == 'GET':
         res = json.loads(res.text)
-        user = requests.get('http://localhost:8001/me/'+str(res['userid']), headers=headers)
-        user = json.loads(user.text)
+        res_b1 = requests.get('http://localhost:8001/me/'+str(res['userid']), headers=headers)
+        status = {'user_status_code': True, 'users_status_code': False}
+        if res_b1.status_code != 200:
+            status['user_status_code'] = False
+            return render_template('layout.html', access=True, status=False)
+        user = json.loads(res_b1.text)
 
         page = 1
         if 'page' in request.args:
@@ -89,11 +99,13 @@ def users():
 
         body = json.dumps({'page': page})
         res_b1 = requests.get('http://localhost:8001/users', data=body, headers=headers)
-        users = json.loads(res_b1.text)
+        status['users_status_code'] = False
+        if res_b1.status_code == 200:
+            users = json.loads(res_b1.text)
+            status['users_status_code'] = True
+        return render_template('users.html', access=True, data=body, user=user, user_list=users, status=status)
 
-        return render_template('users.html', access=True, data=body, user=user, user_list=users)
-
-    return "error"
+    return redirect('index')
 
 
 @app.route('/signup', methods=['POST', 'GET'])

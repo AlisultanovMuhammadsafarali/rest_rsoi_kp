@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
-    {% for friend in friend_list %}
+    {% for friend in friend_list['items'] %}
       <td class="main_panel"> 
         <div id="users_list">
           <div>
@@ -19,5 +19,13 @@
       </td>
     {% endfor %}
     </tr>
+
+    {% if friend_list.page > 1 %}
+    <a href="{{ url_for('friends', page=friend_list.page-1)}}">&lt;&lt; prev</a>
+    {% else %}&lt;&lt; prev{% endif %} |
+    {% if friend_list.page < friend_list.pages %}
+    <a href="{{ url_for('friends', page=friend_list.page+1) }}"> next &gt;&gt;</a>
+    {% else %} next &gt;&gt;{% endif %}
+
     </tbody>
 {% endblock %}
