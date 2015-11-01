@@ -7,6 +7,7 @@
         <dd><input type=submit value=All>
       </dl>
     </form>
+    {% if status.permission_add_post_code %}
     <form action="{{ url_for('addposts') }}" method=post class=add-entry>
       <dl>
         <dt>Title:
@@ -16,11 +17,13 @@
         <dd><input type=submit value=Share>
       </dl>
     </form>
+    {% endif %}
 
     <ul class=posts>
 
     {% for entry in posts['items'] %}
-      <li><h2>{{ entry.title }}</h2>{{ entry.text|safe }} <h5>{{ entry.dateAdd }}</h5>
+      <li><h2>{{ entry.title }}</h2>{{ entry.text|safe }} 
+      <h5>{{ entry.dateAdd }}</h5>
 
       <form action="{{ url_for('addcomments', postid=entry.postid) }}" method=post class=add-entry>
         <dl>
@@ -36,10 +39,10 @@
     </ul>
     
     {% if posts.page > 1 %}
-    <a href="{{ url_for('posts', page=posts.page-1)}}">&lt;&lt; prev</a>
+    <a href="{{ url_for('posts', page=posts.page-1, userid=posts['items'][0].userid )}}">&lt;&lt; prev</a>
     {% else %}&lt;&lt; prev{% endif %} |
     {% if posts.page < posts.pages %}
-    <a href="{{ url_for('posts', page=posts.page+1) }}"> next &gt;&gt;</a>
+    <a href="{{ url_for('posts', page=posts.page+1, userid=posts['items'][0].userid ) }}"> next &gt;&gt;</a>
     {% else %} next &gt;&gt;{% endif %}
 
 {% else %}

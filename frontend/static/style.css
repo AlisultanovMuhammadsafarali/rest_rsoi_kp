@@ -64,6 +64,10 @@ h2 {
     background: #fafafa; 
 }
 
+#login {
+    text-align: left;
+}
+
 .flash { 
     background: #cee5F5; 
     padding: 0.5em;

@@ -4,9 +4,16 @@
 <div class=page>
   <h1>IdeaKeep</h1>
   <div class=metanav>
+  {% for message in get_flashed_messages() %}
+    <div class=flash>{{ message }}</div>
+  {% endfor %}
+
   {% if not access %}
     <a href="{{ url_for('login') }}">log in</a>
     <a href="{{ url_for('signup') }}">sign up</a>
+
+    {% block login_body %}
+    {% endblock %}
   {% else %}
     <a href="{{ url_for('posts') }}">mypage</a>
     <a href="{{ url_for('users') }}">users</a>
@@ -23,13 +30,11 @@
     </table>
   </div>
 
-    {% block body %}
-    {% endblock %}
+  {% block body %}
+  {% endblock %}
 
   {% endif %}
   
-  {% for message in get_flashed_messages() %}
-    <div class=flash>{{ message }}</div>
-  {% endfor %}
+
 
 </div>

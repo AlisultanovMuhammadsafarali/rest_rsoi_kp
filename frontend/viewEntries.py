@@ -14,13 +14,15 @@ app.config['PROPAGATE_EXCEPTIONS'] = True
 def posts():
     res = check()
     if res.status_code == 200 and request.method == 'GET':
+        status = {'user_status_code': True, 'post_status_code': False, 'permission_add_post_code': True}
         res = json.loads(res.text)
         userid = res['userid']
         if 'userid' in request.args:
+            status['permission_add_post_code'] = False
             userid = request.args['userid']
 
         res_b1 = requests.get('http://localhost:8001/me/'+str(userid), headers=headers)
-        status = {'user_status_code': True, 'post_status_code': False}
+        
         if res_b1.status_code != 200:
             status['user_status_code'] = False
             return render_template('layout.html', access=True, status=status)
