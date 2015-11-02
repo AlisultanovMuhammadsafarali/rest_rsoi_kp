@@ -25,8 +25,14 @@
       <li><h2>{{ entry.title }}</h2>{{ entry.text|safe }} 
       <h5>{{ entry.dateAdd }}</h5>
 
+      {% for comment in comments %}
+        <li><h3>{{ comment.text }}</h3></li>
+        <h5>{{ comment.dateAdd }}</h5>
+
+      {% endfor %}
+
       {% if status.permission_add_comment_code %}
-      <form action="{{ url_for('addcomments', postid=entry.postid) }}" method=post class=add-entry>
+      <form action="{{ url_for('addcomments', postid=entry.postid, whoPageUserId=user[0]['userid']) }}" method=post class=add-entry>
         <dl>
           <dt>Comment:
           <dd><textarea name=text rows=1 cols=40></textarea>

@@ -65,33 +65,38 @@ def addposts():
     return json.dumps(data), code
 
 
-@app.route('/comments', methods=['GET'])
-@app.route('/comments/<int:postid>', methods=['GET', 'POST'])
-def comments(postid=None):
-    if postid is not None:
-        allcomments = Comments.query.filter_by(postid=postid).all()
-
-    if allcomments is not None:
-        u = []
-        for c in allcomments:
-            d = c.dateAdd
-            u.append({'user_id_whoAdd': c.user_id_whoAdd, 'postid': c.post_id, 'text': c.text, 'dateAdd': str(d.strftime("%d.%m.%y %H:%M")) })
-
-        code = 200
-        data = u
-    else:
-        code=204
-        data = {'error': {'code': code, 'message': 'No Content'}}
-
-    return json.dumps(data), code
-
-
-@app.route('/comments/add/<int:postid>', methods=['POST'])
-def addcomment(postid):
+@app.route('/comments', methods=['GET', 'POST'])
+def comments():
     code = 400
-    data = {'error': {'message': 'Bad request', 'information': 'Incorrect credentials'}}
+    if request.method == 'GET':
+        postid = request.json.get('listpostid')
+        code=204
+        if postid is not None:
+            db.session.query(Comments).filter(Users.id.in_((listid))).all()
+            # allcomments = Comments.query.filter_by(postid=postid).all()
+
+            print "__ listpostid: ok"
+            if allcomments is not None:
+                print "__ allcomments: ok"
+                data = []
+                for c in allcomments:
+                    d = c.dateAdd
+                    data.append({'user_id_whoAdd': c.user_id_whoAdd, 'postid': c.post_id, 'text': c.text, 'dateAdd': str(d.strftime("%d.%m.%y %H:%M")) })
+
+                code = 200
+
+                print "___ data: ", data
+                return json.dumps(data), code
+
+    return json.dumps(code)
+
+
+@app.route('/comments/add', methods=['POST'])
+def addcomment():
+    code = 400
     comment = request.json.get('comment')
     if comment is not None:
+        print "_____ Comment: ", comment
         user_id_whoAdd = comment['userid']
         postid = comment['postid']
         text = comment['text']
@@ -100,6 +105,7 @@ def addcomment(postid):
         db.session.add(query)
         db.session.commit()
         code = 200
-        data = {'message': "ok"}
+    else:
+        code = 204
 
-    return json.dumps(data), code
+    return json.dumps(code)

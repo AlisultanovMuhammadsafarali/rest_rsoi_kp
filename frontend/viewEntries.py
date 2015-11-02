@@ -1,5 +1,5 @@
 from frontend import app
-from flask import request, redirect, \
+from flask import request, redirect, url_for, \
                   render_template, flash, make_response
 import json, requests
 from views import check
@@ -41,14 +41,28 @@ def posts():
         if 'page' in request.args:
             page = request.args.get('page')
 
+        #get posts
         body = json.dumps({'page': page, 'userid': userid})
         res_b2 = requests.get('http://localhost:8002/posts', data=body, headers=headers)
+
         status['post_status_code'] = False
         if res_b2.status_code == 200:
             res_b2 = json.loads(res_b2.text)
             status['post_status_code'] = True
-            # if int(userid) == int(res['userid']):
-                
+
+            #get comments
+                #get posts_id
+            listpostid = []
+            for p in res_b2['items']:
+                listpostid.append(p['postid'])
+
+            if listpostid is not None:
+                body = json.dumps({'listpostid': listpostid})
+                getcomments = requests.get('http://localhost:8002/comments', data=body, headers=headers)
+                comments = json.loads(getcomments.text)
+                print "__________ comments ", comments
+
+
         return render_template('posts.html', access=True, posts=res_b2, user=user, status=status)
 
     return redirect('index')
@@ -59,12 +73,15 @@ def addcomments():
     res = check()
     if res.status_code == 200 and request.method == 'POST':
         res = json.loads(res.text)
-        res_b1 = requests.get('http://localhost:8001/me/'+str(res['userid']), headers=headers)
-        status = {'user_status_code': True, 'post_status_code': False}
-        if res_b1.status_code != 200:
-            status['user_status_code'] = False
-            return render_template('layout.html', access=True, status=status)
-        user = json.loads(res_b1.text)
+        userid = request.args['whoPageUserId']
+
+        body = json.dumps({'comment':{'userid': res['userid'], 
+                                      'postid': request.args['postid'], 
+                                      'text': request.form['text']}})
+
+        res_b2 = requests.post('http://localhost:8002/comments/add', data=body, headers=headers)
+
+        return redirect(url_for('posts', userid=userid))
 
     return redirect('index')
 

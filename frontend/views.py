@@ -88,7 +88,6 @@ def friends(friendid=None):
     return redirect('/index')
 
 
-
 @app.route('/users', methods=['GET', 'POST'])
 def users():
     res = check()

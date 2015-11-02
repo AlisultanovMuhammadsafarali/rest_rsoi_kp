@@ -28,7 +28,7 @@ h2 {
     background: white; 
 }
 
-/*.posts { 
+.posts { 
     list-style: none; 
     margin: 0; 
     padding: 0; 
@@ -45,7 +45,7 @@ h2 {
 
 .posts li h5 {
     margin-left: 70%;
-}*/
+}
 
 .add-entry { 
     font-size: 0.9em; 
