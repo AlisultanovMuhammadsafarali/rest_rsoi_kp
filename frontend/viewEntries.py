@@ -55,12 +55,18 @@ def posts():
             listpostid = []
             for p in res_b2['items']:
                 listpostid.append(p['postid'])
+            print "_________ ", listpostid
 
-            if listpostid is not None:
+            #get comments
+            if len(listpostid) > 0:
                 body = json.dumps({'listpostid': listpostid})
-                getcomments = requests.get('http://localhost:8002/comments', data=body, headers=headers)
-                comments = json.loads(getcomments.text)
+                res_comments = requests.get('http://localhost:8002/comments', data=body, headers=headers)
+                # comments = json.loads(res_comments.text)
                 print "__________ comments ", comments
+
+                # merge Comments and Posts
+                if res_comments.status_code == 200:
+
 
 
         return render_template('posts.html', access=True, posts=res_b2, user=user, status=status)

@@ -69,23 +69,22 @@ def addposts():
 def comments():
     code = 400
     if request.method == 'GET':
-        postid = request.json.get('listpostid')
+        listpostid = request.json.get('listpostid')
         code=204
-        if postid is not None:
-            db.session.query(Comments).filter(Users.id.in_((listid))).all()
+        if listpostid is not None:
+            allcomments = db.session.query(Comments).filter(Comments.post_id.in_((listpostid))).all()
             # allcomments = Comments.query.filter_by(postid=postid).all()
 
-            print "__ listpostid: ok"
             if allcomments is not None:
-                print "__ allcomments: ok"
                 data = []
                 for c in allcomments:
                     d = c.dateAdd
-                    data.append({'user_id_whoAdd': c.user_id_whoAdd, 'postid': c.post_id, 'text': c.text, 'dateAdd': str(d.strftime("%d.%m.%y %H:%M")) })
+                    data.append({'user_id_whoAdd': c.user_id_whoAdd, 
+                                 'postid': c.post_id, 
+                                 'text': c.text, 
+                                 'dateAdd': str(d.strftime("%d.%m.%y %H:%M")) })
 
                 code = 200
-
-                print "___ data: ", data
                 return json.dumps(data), code
 
     return json.dumps(code)
