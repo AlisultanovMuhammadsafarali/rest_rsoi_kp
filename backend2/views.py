@@ -43,13 +43,12 @@ def posts():
         else:
             code = 204
 
-    return code
+    return json.dumps(code)
 
 
 @app.route('/posts/add', methods=['POST'])
 def addposts():
     code = 400
-    data = {'error': {'message': 'Bad request', 'information': 'Incorrect credentials'}}
     entry = request.json.get('entry')
     if entry is not None:
         userid = entry['userid']
@@ -59,10 +58,9 @@ def addposts():
         query = Post(userid, title, text)
         db.session.add(query)
         db.session.commit()
-        code = 200
-        data = {'message': "ok"}
+        code = 201
 
-    return json.dumps(data), code
+    return json.dumps({'status_code': code})
 
 
 @app.route('/comments', methods=['GET', 'POST'])
@@ -87,7 +85,7 @@ def comments():
                 code = 200
                 return json.dumps(data), code
 
-    return json.dumps(code)
+    return json.dumps({'status_code': code})
 
 
 @app.route('/comments/add', methods=['POST'])
@@ -95,7 +93,6 @@ def addcomment():
     code = 400
     comment = request.json.get('comment')
     if comment is not None:
-        print "_____ Comment: ", comment
         user_id_whoAdd = comment['userid']
         postid = comment['postid']
         text = comment['text']
@@ -103,7 +100,7 @@ def addcomment():
         query = Comments(user_id_whoAdd, postid, text)
         db.session.add(query)
         db.session.commit()
-        code = 200
+        code = 201
     else:
         code = 204
 

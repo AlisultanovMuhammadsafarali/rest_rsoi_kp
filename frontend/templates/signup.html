@@ -1,8 +1,9 @@
 {% extends "layout.html" %}
-{% block body %}
-  <h2>Sign up</h2>
+{% block login_body %}
+  
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
-  <form action="{{ url_for('signup') }}" method=post>
+  <form id="login" action="{{ url_for('signup') }}" method=post>
+    <h2>Sign up</h2>
     <dl>
       <dt>Login:
       <dd><input type=text name=login>

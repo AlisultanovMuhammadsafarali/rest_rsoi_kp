@@ -14,8 +14,8 @@ PER_PAGE = 2
 @app.route('/signup', methods=['POST'])
 def signup():
     code = 400
-    data = {'error': {'message': 'Bad request'}}
     if request.method == 'POST':
+        code = 204
         userid = request.json.get('userid')
         username = request.json.get('username')
         email = request.json.get('email')
@@ -24,18 +24,17 @@ def signup():
             user = Users(userid, username, email, phone)
             db.session.add(user)
             db.session.commit()
-            code = 200
-            data = {'message': 'ok'}
+            code = 201
 
-    return json.dumps(data, code)
+    return json.dumps(code)
 
 
 @app.route('/me', methods=['GET'])
 @app.route('/me/<int:userid>', methods=['GET'])
 def me(userid=None):
     code = 400
-    data = {'error': {'message': 'Bad request'}}
     if request.method == 'GET':
+        code=204
         # userid = request.json.get('userid')
         if userid is not None:
             me = Users.query.filter_by(user_fk=userid).all()
@@ -44,16 +43,13 @@ def me(userid=None):
 
         #print "__________ ", me[0]
         if me is not None:
-            u = []
+            data = []
             for user in me:
-                u.append({'userid': user.user_fk, 'avatarid': user.avatar_id, 'username': user.name, 'email': user.email, 'phone': user.phone})
+                data.append({'userid': user.user_fk, 'avatarid': user.avatar_id, 'username': user.name, 'email': user.email, 'phone': user.phone})
             code = 200
-            data = u
-        else:
-            code=204
-            data = {'error': {'code': code, 'message': 'No Content'}}
+            return json.dumps(data, code)
 
-    return json.dumps(data, code)
+    return json.dumps(code)
 
 
 @app.route('/users', methods=['GET'])
@@ -142,12 +138,13 @@ def friend(userid=None, friendid=None):
 
             return json.dumps(result, code)
 
+
     if request.method == 'POST':
         if userid and friendid is not None:
             record = Friends(userid, friendid)
             db.session.add(record)
             db.session.commit()
-            code = 200
+            code = 201
 
     return json.dumps(code)
 

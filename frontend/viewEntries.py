@@ -101,28 +101,24 @@ def addcomments():
 
 @app.route('/posts/add', methods=['POST'])
 def addposts():
-    if request.method == 'POST':
-        key = request.cookies.get('key')
-        if key is not None:
-            body = json.dumps({'key': key})
-            res = requests.post('http://localhost:8003/status', data=body, headers=headers)
-            if res.status_code == 200:
-                title = request.form['title']
-                text = request.form['text']
-                data = {'entry': {'userid': json.loads(res.text)['userid'], 'title': title, 'text': text}}
-                body = json.dumps(data)
-                res_b2 = requests.post('http://localhost:8002/posts/add', data=body, headers=headers)
-                if res_b2.status_code == 200:
-                    flash('New entry was successfully posted')
-                else:
-                    flash('failed add new entry')
+    res = check()
+    if res.status_code == 200 and request.method == 'POST':
+        res = json.loads(res.text)
 
-                return redirect('/posts')
-            else:
-                flash(json.loads(res.text)['error'])
-                return redirect('/posts')
-        else:
-            return redirect('/logout')
+        title = request.form['title']
+        text = request.form['text']
+        data = {'entry': {'userid': res['userid'], 'title': title, 'text': text}}
+
+        body = json.dumps(data)
+        res_b2 = requests.post('http://localhost:8002/posts/add', data=body, headers=headers)
+
+        res_b2 = json.loads(res_b2.text)
+        if res_b2['status_code'] == 201:
+            flash('New post has been added')
+        elif res_b2['status_code'] == 400:
+            flash('Failed add new post. Bad Request')
+
+        return redirect(url_for('posts', userid=res['userid']))
 
     return render_template('posts.html')
 
