@@ -14,7 +14,7 @@
           <div>
             <div class="user_block">
               <a href="{{ url_for('posts', userid=user['userid']) }}">{{ user.user }}</a>
-              <form method=get action="{{ url_for('friends', userid=user['userid']) }}">
+              <form method=post action="{{ url_for('friends', userid=user['userid']) }}">
                 <input id="flat_button" type=submit value="Добавить в друзья"/>
 
                 <!-- <input type="hidden" name="userid" value="{{ user['userid'] }}"> -->

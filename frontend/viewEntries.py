@@ -68,9 +68,10 @@ def posts():
                     # print "__________ comments ", res_comments
 
                     #get users_name whoAddComment
-                    # listuserid
-                    # for p in res_comments:
-                        
+                    listuserid = []
+                    for p in res_comments:
+                        listuserid.append(p['user_id_whoAdd'])
+                    print "listuserid: ", listuserid
 
                     return render_template('posts.html', access=True, posts=res_b2, comments=res_comments, user=user, status=status)
 

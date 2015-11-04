@@ -90,6 +90,18 @@ def users():
     return json.dumps(code)
 
 
+@app.route('/userlist', methods=['GET'])
+def userlist():
+    code = 400
+    if request.method == 'GET':
+        code = 204
+        userlist = request.json.get('listuserid')
+        print "userlist: ", userlist
+        # if userlist is not None:
+
+    return json.dumps(code)
+
+
 @app.route('/friend', methods=['GET'])
 @app.route('/friend/<int:userid>/<int:friendid>', methods=['POST'])
 def friend(userid=None, friendid=None):

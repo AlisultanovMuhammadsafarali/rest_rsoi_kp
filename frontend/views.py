@@ -80,12 +80,16 @@ def friends(friendid=None):
 
     if res.status_code == 200 and request.method == 'POST':
         if 'userid' in request.args:
+            res = json.loads(res.text)
             res_b1 = requests.post('http://localhost:8001/friend/'+str(res['userid'])+'/'+str(request.args['userid']), headers=headers)
-            flash("Ok")
+            if res_b1.status_code == 200:
+                flash("Ok")
+            else:
+                flash("status code: "+str(res_b1.status_code))
         else:
             return "Not friendid"
 
-    return redirect('/index')
+    return request
 
 
 @app.route('/users', methods=['GET', 'POST'])
