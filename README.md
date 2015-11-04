@@ -11,4 +11,4 @@ Project structure<br>
   <br>
   frondent refers to the back-ends via nginx
 
-[drag]: https://github.com/AlisultanovMuhammadsafarali/rest_rsoi_kp/blob/master/rsoi_v03.png"
+![alt tag](https://github.com/AlisultanovMuhammadsafarali/rest_rsoi_kp/blob/master/rsoi_v03.png)
