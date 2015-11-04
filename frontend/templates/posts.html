@@ -26,9 +26,12 @@
       <h5>{{ entry.dateAdd }}</h5>
 
       {% for comment in comments %}
-        <li><h3>{{ comment.text }}</h3></li>
-        <h5>{{ comment.dateAdd }}</h5>
-
+        {% if comment.postid == entry.postid %}
+          <li>
+              <h3>{{ comment.text }}</h3>
+              <h3>{{ comment.dateAdd }}</h3>
+          </li>
+        {% endif %}
       {% endfor %}
 
       {% if status.permission_add_comment_code %}

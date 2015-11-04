@@ -45,10 +45,10 @@ def posts():
         body = json.dumps({'page': page, 'userid': userid})
         res_b2 = requests.get('http://localhost:8002/posts', data=body, headers=headers)
 
-        status['post_status_code'] = False
         if res_b2.status_code == 200:
             res_b2 = json.loads(res_b2.text)
             status['post_status_code'] = True
+
 
             #get comments
                 #get posts_id
@@ -61,12 +61,18 @@ def posts():
             if len(listpostid) > 0:
                 body = json.dumps({'listpostid': listpostid})
                 res_comments = requests.get('http://localhost:8002/comments', data=body, headers=headers)
-                # comments = json.loads(res_comments.text)
-                print "__________ comments ", comments
 
                 # merge Comments and Posts
                 if res_comments.status_code == 200:
+                    res_comments = json.loads(res_comments.text)
+                    # print "__________ comments ", res_comments
 
+                    #get users_name whoAddComment
+                    # listuserid
+                    # for p in res_comments:
+                        
+
+                    return render_template('posts.html', access=True, posts=res_b2, comments=res_comments, user=user, status=status)
 
 
         return render_template('posts.html', access=True, posts=res_b2, user=user, status=status)
