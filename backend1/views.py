@@ -56,14 +56,18 @@ def me(userid=None):
 def users():
     code = 400
     if request.method == 'GET':
-        page = int(request.json.get('page')) #int(request.args['page'])
+        if 'page' in request.data:
+            page = int(request.json.get('page'))
+        else:
+            return abort(code)
+
+        code = 204
         if page is not None:
             #record = db.session.query(Users.user_fk, Users.name).all()
             count = Users.query.count()
             record = Users.query.paginate(page, PER_PAGE, count)
         else:
-            code = 204
-            return json.dumps(code)
+            return json.dumps({"message": "No Content"}), code
 
         if record is not None:
             items = record.items
@@ -77,25 +81,41 @@ def users():
                           'total': record.total,
                           'pages': record.pages,
                           'items': result}
-                return json.dumps(result, code)
+                return json.dumps(result), code
             else:
-                code = 204
+                return json.dumps({"message": "No Content"}), code
         else:
-            code = 204
+            return json.dumps({"message": "No Content"}), code
 
-    return json.dumps(code)
+    return abort(code)
 
 
 @app.route('/userlist', methods=['GET'])
 def userlist():
     code = 400
     if request.method == 'GET':
-        code = 204
-        userlist = request.json.get('listuserid')
-        print "userlist: ", userlist
-        # if userlist is not None:
+        if 'listuserid' in request.data:
+            userlist = request.json.get('listuserid')
+        else:
+            return abort(code)
 
-    return json.dumps(code)
+        if len(userlist) > 0:
+            code = 204
+            res = db.session.query(Users).filter(Users.user_fk.in_((userlist))).all()
+
+            if res is not None:
+                code = 200
+                result = []
+                for r in res:
+                    result.append({'userid': r.user_fk, 'username': r.name, 'email': r.email, 'phone': r.phone})
+
+                return json.dumps(result), code
+            else:
+                return json.dumps({"message": "No Content"}), code
+        else:
+            abort(code)
+
+    return abort(code)
 
 
 @app.route('/friend', methods=['GET'])
@@ -124,7 +144,7 @@ def friend(userid=None, friendid=None):
                       'pages': 1,
                       'items': result}
             if len(listid) > 0:
-                res = db.session.query(Users).filter(Users.id.in_((listid))).all()
+                res = db.session.query(Users).filter(Users.user_fk.in_((listid))).all()
 
                 if res is not None:
                     code = 200

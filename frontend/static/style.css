@@ -26,6 +26,12 @@ h3 {
     color: green;
 }
 
+h4 {
+    font-size: 0.9em;
+    font-family: 'Georgia', serif;
+    color: black;
+}
+
 .page { 
     margin: 2em auto; 
     width: 35em; 

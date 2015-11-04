@@ -71,9 +71,14 @@ def posts():
                     listuserid = []
                     for p in res_comments:
                         listuserid.append(p['user_id_whoAdd'])
-                    print "listuserid: ", listuserid
 
-                    return render_template('posts.html', access=True, posts=res_b2, comments=res_comments, user=user, status=status)
+                    if len(listuserid) > 0:
+                        body = json.dumps({'listuserid': listuserid})
+                        res_b1 = requests.get('http://localhost:8001/userlist', data=body, headers=headers)
+                    # print "listuserid: ", listuserid
+                        if res_b1.status_code == 200:
+                            res_b1 = json.loads(res_b1.text)
+                            return render_template('posts.html', access=True, posts=res_b2, comments=res_comments, users=res_b1, user=user, status=status)
 
 
         return render_template('posts.html', access=True, posts=res_b2, user=user, status=status)

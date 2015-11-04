@@ -27,10 +27,17 @@
 
       {% for comment in comments %}
         {% if comment.postid == entry.postid %}
-          <li>
-              <h3>{{ comment.text }}</h3>
-              <h3>{{ comment.dateAdd }}</h3>
-          </li>
+          {% for usr in users %}
+            {% if usr.userid == comment.user_id_whoAdd %}
+
+              <li>
+                  <h4>{{ usr.username }}</h4>
+                  <h3 style="margin-left: 15px">{{ comment.text }}</h3>
+                  <h3 style="margin-left: 15px">{{ comment.dateAdd }}</h3>
+              </li>
+
+            {% endif %}
+          {% endfor %}
         {% endif %}
       {% endfor %}
 

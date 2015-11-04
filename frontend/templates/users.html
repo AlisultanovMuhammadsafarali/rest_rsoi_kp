@@ -15,7 +15,7 @@
             <div class="user_block">
               <a href="{{ url_for('posts', userid=user['userid']) }}">{{ user.user }}</a>
               <form method=post action="{{ url_for('friends', userid=user['userid']) }}">
-                <input id="flat_button" type=submit value="Добавить в друзья"/>
+                <input id="flat_button" type=submit value="Подписаться"/>
 
                 <!-- <input type="hidden" name="userid" value="{{ user['userid'] }}"> -->
               <!--<input id="flat_button" type="button" onclick="location.href='http://localhost:80';" value="Добавить в друзья" /> -->
