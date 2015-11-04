@@ -112,10 +112,9 @@ def addposts():
         body = json.dumps(data)
         res_b2 = requests.post('http://localhost:8002/posts/add', data=body, headers=headers)
 
-        res_b2 = json.loads(res_b2.text)
-        if res_b2['status_code'] == 201:
+        if res_b2.status_code == 201:
             flash('New post has been added')
-        elif res_b2['status_code'] == 400:
+        elif res_b2.status_code == 400:
             flash('Failed add new post. Bad Request')
 
         return redirect(url_for('posts', userid=res['userid']))

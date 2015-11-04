@@ -1,5 +1,5 @@
 from backend2 import app
-from flask import request, redirect, url_for, abort
+from flask import request, redirect, url_for, abort, make_response
 from sqlalchemy import desc
 import json
 
@@ -39,9 +39,9 @@ def posts():
                           'items': result}
                 return json.dumps(result), code
             else:
-                code = 204
+                return json.dumps({"message": "No Content"}), code
         else:
-            code = 204
+            json.dumps({"message": "No Content"}), code
 
     return json.dumps(code)
 
@@ -49,31 +49,43 @@ def posts():
 @app.route('/posts/add', methods=['POST'])
 def addposts():
     code = 400
-    entry = request.json.get('entry')
-    if entry is not None:
-        userid = entry['userid']
-        title = entry['title']
-        text = entry['text']
+    if request.method == 'POST':
+        if 'entry' in request.data:
+            entry = request.json.get('entry')
+        else:
+            return abort(code)
 
-        query = Post(userid, title, text)
-        db.session.add(query)
-        db.session.commit()
-        code = 201
+        if entry is not None:
+            userid = entry['userid']
+            title = entry['title']
+            text = entry['text']
 
-    return json.dumps({'status_code': code})
+            query = Post(userid, title, text)
+            db.session.add(query)
+            db.session.commit()
+            code = 201
+            return json.dumps({"message": "Created "}), code
+        else:
+            return abort(code)
+
+    return abort(code)
 
 
 @app.route('/comments', methods=['GET', 'POST'])
 def comments():
     code = 400
     if request.method == 'GET':
-        listpostid = request.json.get('listpostid')
+        if 'listpostid' in request.data:
+            listpostid = request.json.get('listpostid')
+        else:
+            return abort(code)
+
         code=204
         if listpostid is not None:
             allcomments = db.session.query(Comments).filter(Comments.post_id.in_((listpostid))).all()
             # allcomments = Comments.query.filter_by(postid=postid).all()
 
-            if allcomments is not None:
+            if len(allcomments) > 0:
                 data = []
                 for c in allcomments:
                     d = c.dateAdd
@@ -84,8 +96,12 @@ def comments():
 
                 code = 200
                 return json.dumps(data), code
+            else:
+                return json.dumps({"message": "No Content"}), code
+        else:
+            return json.dumps({"message": "No Content"}), code
 
-    return json.dumps({'status_code': code})
+    return abort(code)
 
 
 @app.route('/comments/add', methods=['POST'])
@@ -101,7 +117,8 @@ def addcomment():
         db.session.add(query)
         db.session.commit()
         code = 201
+        return abort(code)
     else:
-        code = 204
+        return json.dumps({"message": "No Content"}), code
 
-    return json.dumps(code)
+    return abort(code)
