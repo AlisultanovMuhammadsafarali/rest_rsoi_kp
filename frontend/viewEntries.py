@@ -49,13 +49,12 @@ def posts():
             res_b2 = json.loads(res_b2.text)
             status['post_status_code'] = True
 
-
             #get comments
                 #get posts_id
             listpostid = []
             for p in res_b2['items']:
                 listpostid.append(p['postid'])
-            print "_________ ", listpostid
+            # print "_________ ", listpostid
 
             #get comments
             if len(listpostid) > 0:

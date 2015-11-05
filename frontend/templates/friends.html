@@ -7,7 +7,8 @@
             <div class="user_block">
               <table>
                 <tr valign="center">
-                  <td><h2>{{ friend['username'] }}</h2> </td>
+                  <td><a href="{{ url_for('posts', userid=friend['userid']) }}">{{ friend['username'] }}</a>
+                  <!-- <h2>{{ friend['username'] }}</h2> --> </td>
                   <td><h2>{{ friend['email'] }}</h2> </td>
                   <td><h2>{{ friend['phone'] }}</h2> </td>
                 </tr>

@@ -10,6 +10,8 @@ db.init_app(app)
 
 
 PER_PAGE = 2
+messageNoContent = {"message": "No Content"}
+
 
 @app.route('/signup', methods=['POST'])
 def signup():
@@ -56,8 +58,9 @@ def me(userid=None):
 def users():
     code = 400
     if request.method == 'GET':
-        if 'page' in request.data:
+        if 'page' and 'userid' in request.data:
             page = int(request.json.get('page'))
+            userid = int(request.json.get('userid'))
         else:
             return abort(code)
 
@@ -65,9 +68,9 @@ def users():
         if page is not None:
             #record = db.session.query(Users.user_fk, Users.name).all()
             count = Users.query.count()
-            record = Users.query.paginate(page, PER_PAGE, count)
+            record = Users.query.filter(Users.user_fk!=userid).paginate(page, PER_PAGE, count)
         else:
-            return json.dumps({"message": "No Content"}), code
+            return json.dumps(messageNoContent), code
 
         if record is not None:
             items = record.items
@@ -83,9 +86,9 @@ def users():
                           'items': result}
                 return json.dumps(result), code
             else:
-                return json.dumps({"message": "No Content"}), code
+                return json.dumps(messageNoContent), code
         else:
-            return json.dumps({"message": "No Content"}), code
+            return json.dumps(messageNoContent), code
 
     return abort(code)
 
@@ -111,9 +114,37 @@ def userlist():
 
                 return json.dumps(result), code
             else:
-                return json.dumps({"message": "No Content"}), code
+                return json.dumps(messageNoContent), code
         else:
             abort(code)
+
+    return abort(code)
+
+
+@app.route('/friend/all', methods=['GET'])
+def friendall():
+    code = 400
+    if request.method == 'GET':
+        if 'userid' in request.data:
+            userid = int(request.json.get('userid'))
+        else:
+            abort(code)
+
+        record = Friends.query.filter_by(user_fk=userid).all()
+
+        # code = 204
+        listid = []
+        result = {'listid': listid}
+        if record is not None:
+            code = 200
+
+            for r in record:
+                listid.append(r.friend_id)
+
+            if len(listid) > 0:
+                # code = 200
+                result = {'listid': listid}
+        return json.dumps(result), code
 
     return abort(code)
 
@@ -123,15 +154,16 @@ def userlist():
 def friend(userid=None, friendid=None):
     code = 400
     if request.method == 'GET':
-        code = 204
-        userid = int(request.json.get('userid'))
-        page = int(request.json.get('page'))
-        if userid and page is not None:
-            count = Friends.query.count()
-            record = Friends.query.filter_by(user_fk=userid).paginate(page, PER_PAGE, count)
+        if 'userid' and 'page' in request.data:
+            userid = int(request.json.get('userid'))
+            page = int(request.json.get('page'))
         else:
-            return json.dumps(code)
+            abort(code)
 
+        count = Friends.query.count()
+        record = Friends.query.filter_by(user_fk=userid).paginate(page, PER_PAGE, count)
+
+        code = 204
         if record is not None:
             listid = []
             items = record.items
@@ -150,13 +182,19 @@ def friend(userid=None, friendid=None):
                     code = 200
                     result = []
                     for r in res:
-                        result.append({'username': r.name, 'email': r.email, 'phone': r.phone})
+                        result.append({'userid': r.user_fk, 'username': r.name, 'email': r.email, 'phone': r.phone})
                     result = {'page': record.page,
                               'total': record.total,
                               'pages': record.pages,
                               'items': result}
+                    return json.dumps(result), code
 
-            return json.dumps(result, code)
+                else:
+                    return json.dumps(result), code
+            else:
+                return json.dumps(result), code
+        else:
+            return json.dumps(messageNoContent), code
 
 
     if request.method == 'POST':
@@ -165,8 +203,9 @@ def friend(userid=None, friendid=None):
             db.session.add(record)
             db.session.commit()
             code = 201
+        return json.dumps({"message": "Created "}), code
 
-    return json.dumps(code)
+    return abort(code)
 
 
 @app.route('/isfriend', methods=['GET'])

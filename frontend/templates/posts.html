@@ -2,11 +2,11 @@
 {% block body %}
 
 {% if status.post_status_code %}
-    <form action="{{ url_for('all')}}" method=get class=posts>
+    <!-- <form action="{{ url_for('all')}}" method=get class=posts>
       <dl>
         <dd><input type=submit value=All>
       </dl>
-    </form>
+    </form> -->
     {% if status.permission_add_post_code %}
     <form action="{{ url_for('addposts') }}" method=post class=add-entry>
       <dl>

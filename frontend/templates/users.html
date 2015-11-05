@@ -8,23 +8,29 @@
     {% for message in get_flashed_messages() %}
       <div class=flash>{{ message }}</div>
     {% endfor %}
-    {% for user in user_list['items'] %}
-      <td class="main_panel"> 
-        <div id="users_list">
-          <div>
-            <div class="user_block">
-              <a href="{{ url_for('posts', userid=user['userid']) }}">{{ user.user }}</a>
-              <form method=post action="{{ url_for('friends', userid=user['userid']) }}">
-                <input id="flat_button" type=submit value="Подписаться"/>
+    {% for usr in user_list['items'] %}
+      
+        <td class="main_panel"> 
+          <div id="users_list">
+            <div>
+              <div class="user_block">
+                <a href="{{ url_for('posts', userid=usr['userid']) }}">{{ usr.user }}</a>
 
-                <!-- <input type="hidden" name="userid" value="{{ user['userid'] }}"> -->
-              <!--<input id="flat_button" type="button" onclick="location.href='http://localhost:80';" value="Добавить в друзья" /> -->
-              </form>
+                <form method=post action="{{ url_for('friends', userid=usr['userid']) }}">
+                  {% if not usr.isfriend %}
+                    <form method=post action="{{ url_for('friends', userid=usr['userid']) }}">
+                      <input id="flat_button" type=submit value="Подписаться"/>
+                  {% else %}
+                    <input id="flat_button" style="background: grey" type=submit value="Подписаться" disabled/>
+                  {% endif %}
+                    <!-- <input type="hidden" name="userid" value="{{ user['userid'] }}"> -->
+                  <!--<input id="flat_button" type="button" onclick="location.href='http://localhost:80';" value="Добавить в друзья" /> -->
+                </form>
+              </div>
             </div>
           </div>
-        </div>
+        </td>
 
-      </td>
     {% endfor %}
     </tr>
 

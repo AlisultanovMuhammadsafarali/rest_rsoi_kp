@@ -76,20 +76,24 @@ def friends(friendid=None):
         if friends.status_code == 200:
             res = json.loads(friends.text)
             status['friends_status_code'] = True
-        return render_template('friends.html', access=True, friend_list=res, user=user, status=status)
+
+            return render_template('friends.html', access=True, friend_list=res, user=user, status=status)
+        else:
+            flash('something went wrong')
+            return redirect('index')
 
     if res.status_code == 200 and request.method == 'POST':
         if 'userid' in request.args:
             res = json.loads(res.text)
             res_b1 = requests.post('http://localhost:8001/friend/'+str(res['userid'])+'/'+str(request.args['userid']), headers=headers)
-            if res_b1.status_code == 200:
+            if res_b1.status_code == 200 or 201:
                 flash("Ok")
             else:
                 flash("status code: "+str(res_b1.status_code))
         else:
-            return "Not friendid"
+            flash("Not friendid")
 
-    return request
+    return redirect('index')
 
 
 @app.route('/users', methods=['GET', 'POST'])
@@ -108,13 +112,34 @@ def users():
         if 'page' in request.args:
             page = request.args.get('page')
 
-        body = json.dumps({'page': page})
+        #get users with pagination
+        body = json.dumps({'page': page, 'userid': res['userid']})
         res_b1 = requests.get('http://localhost:8001/users', data=body, headers=headers)
         status['users_status_code'] = False
+
         if res_b1.status_code == 200:
-            users = json.loads(res_b1.text)
-            status['users_status_code'] = True
-        return render_template('users.html', access=True, data=body, user=user, user_list=users, status=status)
+
+            #get all friends current user that set status for button "following"
+            res = requests.get('http://localhost:8001/friend/all', data=body, headers=headers)
+            if res.status_code == 200 or 204:
+                res = json.loads(res.text)
+                users = json.loads(res_b1.text)
+                for usr in users['items']:
+                    if usr['userid'] in res['listid']:
+                        usr['isfriend'] = True
+                    else:
+                        usr['isfriend'] = False
+
+                status['users_status_code'] = True
+            else:
+                flash('something went wrong')
+                return redirect('index')
+
+            return render_template('users.html', access=True, data=body, user=user, user_list=users, status=status)
+
+        else:
+            flash('something went wrong')
+            return redirect('index')
 
     return redirect('index')
 
